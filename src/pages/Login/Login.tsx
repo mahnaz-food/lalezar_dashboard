@@ -11,8 +11,8 @@ interface ILoginForm {
 }
 
 const fields: FormFieldConfig<ILoginForm>[] = [
-  { name: 'email', label: 'Email', md: 12, placeholder: 'Enter email' },
-  { name: 'password', label: 'Password', md: 12, placeholder: 'Enter password', textFieldType: 'password' }
+  { name: 'email', label: 'Email', type: 'text', md: 12, placeholder: 'Enter email' },
+  { name: 'password', label: 'Password', type: 'password', md: 12, placeholder: 'Enter password' }
 ];
 
 const defaultValues: LoginFormValues = {
