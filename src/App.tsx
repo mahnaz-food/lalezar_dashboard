@@ -12,6 +12,7 @@ import ScrollTop from 'components/ScrollTop';
 import { JWTProvider as AuthProvider } from 'contexts/JWTContext';
 import { Toaster } from 'sonner';
 import { MenuProvider } from 'contexts/MenuContext';
+import { ModalProvider } from 'contexts/ModalContext';
 
 // ==============================|| APP - THEME, ROUTER, LOCAL  ||============================== //
 
@@ -21,14 +22,16 @@ export default function App() {
       {/* <RTLLayout> */}
       <Locales>
         <ScrollTop>
-          <MenuProvider>
-            <AuthProvider>
-              <>
-                <RouterProvider router={router} />
-                <Toaster richColors position="bottom-right" duration={4000} />
-              </>
-            </AuthProvider>
-          </MenuProvider>
+          <ModalProvider>
+            <MenuProvider>
+              <AuthProvider>
+                <>
+                  <RouterProvider router={router} />
+                  <Toaster richColors position="bottom-right" duration={4000} />
+                </>
+              </AuthProvider>
+            </MenuProvider>
+          </ModalProvider>
         </ScrollTop>
       </Locales>
       {/* </RTLLayout> */}

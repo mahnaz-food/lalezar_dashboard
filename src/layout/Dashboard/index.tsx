@@ -54,7 +54,7 @@ export default function MainLayout() {
               xs: 0,
               ...(container && { px: { xs: 0, md: 2 } }),
               position: 'relative',
-              minHeight: 'calc(100vh - 110px)',
+              minHeight: 'calc(100vh - 130px)',
               display: 'flex',
               flexDirection: 'column'
             }}

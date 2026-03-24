@@ -14,7 +14,7 @@ export const columns: ColumnDef<IArticle>[] = [
   },
   {
     accessorKey: 'createdAt',
-    header: 'Created At',
+    header: 'Date',
     cell: ({ row }) => {
       const date = new Date(row.original.createdAt);
       return date.toLocaleDateString();
@@ -27,14 +27,20 @@ export default function BlogPage() {
 
   const formatted = data ? data.data.map((item) => ({ ...item, author: item.author.name })) : [];
   return (
-    <ReactTable
-      data={formatted}
-      columns={columns as IArticle[]}
-      tableTitle="Articles List"
-      onAdd={() => {}}
-      enableExport
-      addButtonLabel="Create Blog"
-      isLoading={isLoading}
-    />
+    <>
+      <ReactTable
+        data={formatted}
+        columns={columns as IArticle[]}
+        tableTitle="Articles List"
+        onAdd={() => {}}
+        enableExport
+        addButtonLabel="Create Blog"
+        isLoading={isLoading}
+        getRowLink={(row) => `/blog/${row.id}`}
+        onDeleteRow={(row) => {
+          console.log(row.id);
+        }}
+      />
+    </>
   );
 }

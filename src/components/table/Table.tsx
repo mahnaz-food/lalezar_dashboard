@@ -1,19 +1,35 @@
 import { Fragment, useState } from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { alpha, useTheme } from '@mui/material/styles';
-import { Stack, Button, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Checkbox, Typography } from '@mui/material';
+import {
+  Stack,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableContainer,
+  Checkbox,
+  Typography,
+  IconButton
+} from '@mui/material';
 
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, RowSelectionState, useReactTable } from '@tanstack/react-table';
 
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import { CSVExport, EmptyTable } from 'components/third-party/react-table';
-import { Add } from 'iconsax-react';
+import { Add, Trash, Eye } from 'iconsax-react';
 import TableSkeleton from './TableSkeleton';
 
 interface ReactTableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
   tableTitle?: string;
+
+  getRowLink?: (row: T) => string;
+  onDeleteRow?: (row: T) => void;
 
   onAdd?: () => void;
   addButtonLabel?: string;
@@ -29,6 +45,8 @@ export default function ReactTable<T>({
   data,
   columns,
   tableTitle,
+  getRowLink,
+  onDeleteRow,
   onAdd,
   addButtonLabel = 'Add',
   enableExport = false,
@@ -37,6 +55,7 @@ export default function ReactTable<T>({
 }: ReactTableProps<T>) {
   const theme = useTheme();
   const backColor = alpha(theme.palette.primary.lighter, 0.1);
+  const navigate = useNavigate();
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -52,9 +71,35 @@ export default function ReactTable<T>({
     cell: ({ row }) => <Checkbox checked={row.getIsSelected()} disabled={!row.getCanSelect()} onChange={row.getToggleSelectedHandler()} />
   };
 
+  const actionColumn: ColumnDef<T> = {
+    id: 'actions',
+    header: 'Actions',
+    cell: ({ row }) => {
+      const data = row.original;
+
+      return (
+        <Stack direction="row" spacing={1}>
+          {/* 👁 View */}
+          {getRowLink && (
+            <IconButton color="primary" onClick={() => navigate(getRowLink(data))}>
+              <Eye size="20" />
+            </IconButton>
+          )}
+
+          {/* 🗑 Delete */}
+          {onDeleteRow && (
+            <IconButton color="error" onClick={() => onDeleteRow(data)}>
+              <Trash size="20" />
+            </IconButton>
+          )}
+        </Stack>
+      );
+    }
+  };
+
   const table = useReactTable({
     data,
-    columns: [selectionColumn, ...columns],
+    columns: [selectionColumn, ...columns, actionColumn],
     state: { rowSelection },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -77,9 +122,8 @@ export default function ReactTable<T>({
     <MainCard content={false}>
       {/* Header */}
       <Stack direction="row" justifyContent="space-between" sx={{ p: 3 }}>
+        {tableTitle && <Typography variant="h4">{tableTitle}</Typography>}
         <Stack direction="row" spacing={2} alignItems="center">
-          {tableTitle && <Typography variant="h4">{tableTitle}</Typography>}
-
           {onAdd && (
             <Button variant="contained" startIcon={<Add />} onClick={onAdd}>
               {addButtonLabel}
@@ -104,7 +148,7 @@ export default function ReactTable<T>({
       </Stack>
 
       <ScrollX>
-        <TableContainer>
+        <TableContainer sx={{ maxHeight: 350 }}>
           <Table>
             {/* Table Head */}
             <TableHead>
@@ -129,9 +173,21 @@ export default function ReactTable<T>({
                 table.getRowModel().rows.map((row) => (
                   <Fragment key={row.id}>
                     <TableRow>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                      ))}
+                      {row.getVisibleCells().map((cell, idx) => {
+                        const isFirstCell = idx === 1;
+                        const link = getRowLink?.(row.original);
+                        return (
+                          <TableCell key={cell.id}>
+                            {isFirstCell && link ? (
+                              <RouterLink to={link} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              </RouterLink>
+                            ) : (
+                              flexRender(cell.column.columnDef.cell, cell.getContext())
+                            )}
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
 
                     {row.getIsExpanded() && (

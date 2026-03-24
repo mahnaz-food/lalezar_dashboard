@@ -29,7 +29,7 @@ const MainRoutes = {
         { index: true, element: <DashboardPage /> },
         {
           path: '/blog',
-          element: <BlogPage />
+          element: <BlogPage />,
         },
         {
           path: '/users',
