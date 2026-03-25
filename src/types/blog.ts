@@ -1,4 +1,6 @@
+import { z } from 'zod';
 import { IBaseQueryParams } from './api';
+import { createArticleSchema } from '../../validators/blog-schema';
 
 export interface IGetArticlesParams extends IBaseQueryParams {
   category?: string;
@@ -45,3 +47,5 @@ export type Block =
   | { type: 'image'; src: string; caption?: string }
   | { type: 'list'; items: string[]; ordered?: boolean }
   | { type: 'divider' };
+
+export type ArticleFormValues = z.infer<typeof createArticleSchema>;

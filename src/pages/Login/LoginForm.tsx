@@ -1,6 +1,6 @@
 import { AppForm, FormFieldConfig } from 'components/form/AppFrom';
 import { LoginFormValues } from 'types/user';
-import { loginSchema } from './login-schema';
+import { loginSchema } from '../../../validators/user-schema';
 import { useLoginMutation } from 'hooks/api/user/userHooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';

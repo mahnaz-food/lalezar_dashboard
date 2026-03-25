@@ -4,8 +4,10 @@ import { FormTextField } from './FormTextField';
 import AnimateButton from 'components/@extended/AnimateButton';
 import Button from '@mui/material/Button';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ZodType } from 'zod';
+import { ZodTypeAny } from 'zod';
 import { FormSingleSelect, IOption } from './FormSingleSelect';
+import { FormSwitch } from './FormSwitch';
+import { FormMultiSelect } from './FormMulitSelect';
 
 export type FieldType = 'text' | 'multiLineText' | 'password' | 'select' | 'multiselect' | 'switch';
 
@@ -18,16 +20,18 @@ export type FormFieldConfig<T extends FieldValues> = {
   options?: IOption[];
   xs?: number;
   md?: number;
+  disabled?: boolean;
 };
 
 interface AppFormProps<T extends FieldValues> {
   defaultValues: DefaultValues<T>;
   onSubmit: SubmitHandler<T>;
   fields: FormFieldConfig<T>[];
-  schema: ZodType<T, any, any>;
+  schema: ZodTypeAny;
   isPending?: boolean;
   submitLabel?: string;
   isButtonFullwidth?: boolean;
+  children?: React.ReactNode;
 }
 
 // ================================|| APPFORM COMPONENT ||================================ //
@@ -39,12 +43,13 @@ export function AppForm<T extends FieldValues>({
   schema,
   isPending,
   submitLabel = 'Submit',
-  isButtonFullwidth = false
+  isButtonFullwidth = false,
+  children
 }: AppFormProps<T>) {
   const methods: UseFormReturn<T> = useForm<T>({
     defaultValues,
     mode: 'onChange',
-    resolver: zodResolver(schema)
+    resolver: zodResolver(schema as any)
   });
 
   const {
@@ -54,12 +59,50 @@ export function AppForm<T extends FieldValues>({
   const renderField = (field: FormFieldConfig<T>) => {
     switch (field.type) {
       case 'select':
-        return <FormSingleSelect<T> name={field.name} label={field.label} options={field.options || []} placeholder={field.placeholder} />;
+        return (
+          <FormSingleSelect<T>
+            name={field.name}
+            label={field.label}
+            options={field.options || []}
+            placeholder={field.placeholder}
+            disabled={field.disabled}
+          />
+        );
+
+      case 'multiselect':
+        return (
+          <FormMultiSelect
+            name={field.name}
+            label={field.label}
+            options={field.options || []}
+            placeholder={field.placeholder}
+            disabled={field.disabled}
+          />
+        );
 
       case 'password':
-        return <FormTextField<T> name={field.name} label={field.label} placeholder={field.placeholder} type="password" />;
+        return (
+          <FormTextField<T>
+            name={field.name}
+            label={field.label}
+            placeholder={field.placeholder}
+            type="password"
+            disabled={field.disabled}
+          />
+        );
       case 'multiLineText':
-        return <FormTextField<T> name={field.name} label={field.label} placeholder={field.placeholder} multiline rows={field.rows || 2} />;
+        return (
+          <FormTextField<T>
+            name={field.name}
+            label={field.label}
+            placeholder={field.placeholder}
+            multiline
+            rows={field.rows || 2}
+            disabled={field.disabled}
+          />
+        );
+      case 'switch':
+        return <FormSwitch name={field.name} label={field.label} disabled={field.disabled} />;
 
       case 'text':
       default:
@@ -71,11 +114,19 @@ export function AppForm<T extends FieldValues>({
     <FormProvider<T> {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <Grid container spacing={3}>
+          {/* CUSTOM CONTENT */}
+          {children && (
+            <Grid item xs={12}>
+              {children}
+            </Grid>
+          )}
+
           {fields.map((field) => (
             <Grid item xs={field.xs ?? 12} md={field.md ?? 6} key={field.name}>
               {renderField(field)}
             </Grid>
           ))}
+
           <Grid item xs={12}>
             <AnimateButton>
               <Button

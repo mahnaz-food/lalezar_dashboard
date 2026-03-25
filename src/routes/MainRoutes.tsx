@@ -7,6 +7,8 @@ import PagesLayout from 'layout/Pages';
 import SimpleLayout from 'layout/Simple';
 import { SimpleLayoutType } from 'config';
 import DashboardPage from 'pages/dashboard';
+import SingleArticlePage from 'pages/blog/single-article-page';
+import CreateArticlePage from 'pages/blog/create-article-page';
 
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
 const MaintenanceError500 = Loadable(lazy(() => import('pages/maintenance/error/500')));
@@ -29,7 +31,15 @@ const MainRoutes = {
         { index: true, element: <DashboardPage /> },
         {
           path: '/blog',
-          element: <BlogPage />,
+          element: <BlogPage />
+        },
+        {
+          path: '/blog/:slug',
+          element: <SingleArticlePage />
+        },
+        {
+          path: '/blog/create-article',
+          element: <CreateArticlePage />
         },
         {
           path: '/users',

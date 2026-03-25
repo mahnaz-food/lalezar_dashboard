@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 // project-imports
 import Logo from 'components/logo';
 import AuthWrapper from 'sections/auth/AuthWrapper';
-import LoginForm from './Login';
+import LoginForm from './LoginForm';
 
 // ================================|| LOGIN PAGE ||================================ //
 

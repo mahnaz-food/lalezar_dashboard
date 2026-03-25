@@ -1,4 +1,4 @@
-import { loginSchema } from 'pages/Login/login-schema';
+import { loginSchema } from '../../validators/user-schema';
 import { z } from 'zod';
 
 export type LoginFormValues = z.infer<typeof loginSchema>;

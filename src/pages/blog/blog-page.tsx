@@ -1,6 +1,8 @@
 import { ColumnDef } from '@tanstack/react-table';
 import ReactTable from 'components/table/Table';
+import { useModal } from 'contexts/ModalContext';
 import { useGetArticlesQuery } from 'hooks/api/blog/blogHooks';
+import { useNavigate } from 'react-router';
 import { IArticle } from 'types/blog';
 
 export const columns: ColumnDef<IArticle>[] = [
@@ -23,22 +25,38 @@ export const columns: ColumnDef<IArticle>[] = [
 ];
 
 export default function BlogPage() {
+  const { confirm } = useModal();
   const { data, isLoading } = useGetArticlesQuery();
+  const navigate = useNavigate();
 
   const formatted = data ? data.data.map((item) => ({ ...item, author: item.author.name })) : [];
+
+  const handleDelete = async (id: string) => {
+    const ok = await confirm({
+      title: 'Delete Items',
+      description: 'Are you sure?',
+      onConfirm: async () => {
+        console.log(`Deleting Item with the ID of ${id}...`);
+      }
+    });
+
+    if (ok) {
+      console.log('Deleted');
+    }
+  };
   return (
     <>
       <ReactTable
         data={formatted}
         columns={columns as IArticle[]}
         tableTitle="Articles List"
-        onAdd={() => {}}
+        onAdd={() => navigate('/blog/create-article')}
         enableExport
         addButtonLabel="Create Blog"
         isLoading={isLoading}
         getRowLink={(row) => `/blog/${row.id}`}
         onDeleteRow={(row) => {
-          console.log(row.id);
+          handleDelete(row.slug);
         }}
       />
     </>
