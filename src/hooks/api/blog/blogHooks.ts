@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { createArticle, getArticles, getBlogCategories, getBlogTags } from './blogApi';
+import { createArticle, deleteArticle, getArticles, getBlogCategories, getBlogTags } from './blogApi';
 import { ArticleFormValues, IGetArticlesParams } from 'types/blog';
 
 export const useGetArticlesQuery = (params?: IGetArticlesParams) => {
@@ -31,5 +31,13 @@ export const useCreateArticleMutation = () => {
   return useMutation({
     mutationKey,
     mutationFn: (data: ArticleFormValues) => createArticle(data)
+  });
+};
+
+export const useDeleteArticleMutation = () => {
+  const mutationKey = ['delete-article'];
+  return useMutation({
+    mutationKey,
+    mutationFn: ({ id }: { id: string }) => deleteArticle({ id })
   });
 };

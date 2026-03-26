@@ -1,8 +1,10 @@
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
 import { ColumnDef } from '@tanstack/react-table';
+import { toast } from 'sonner';
 import ReactTable from 'components/table/Table';
 import { useModal } from 'contexts/ModalContext';
-import { useGetArticlesQuery } from 'hooks/api/blog/blogHooks';
-import { useNavigate } from 'react-router';
+import { useDeleteArticleMutation, useGetArticlesQuery } from 'hooks/api/blog/blogHooks';
 import { IArticle } from 'types/blog';
 
 export const columns: ColumnDef<IArticle>[] = [
@@ -25,24 +27,31 @@ export const columns: ColumnDef<IArticle>[] = [
 ];
 
 export default function BlogPage() {
+  const queryClient = useQueryClient();
   const { confirm } = useModal();
   const { data, isLoading } = useGetArticlesQuery();
   const navigate = useNavigate();
 
+  const { mutate: deleteSingleArticle, isPending: isSingleDeletePending } = useDeleteArticleMutation();
+
   const formatted = data ? data.data.map((item) => ({ ...item, author: item.author.name })) : [];
 
   const handleDelete = async (id: string) => {
-    const ok = await confirm({
-      title: 'Delete Items',
-      description: 'Are you sure?',
+    await confirm({
+      title: 'Delete Article',
+      description: 'Are you sure you want to delete this article?',
       onConfirm: async () => {
-        console.log(`Deleting Item with the ID of ${id}...`);
+        deleteSingleArticle(
+          { id },
+          {
+            onSuccess: (data: { message: string }) => {
+              queryClient.invalidateQueries({ queryKey: ['articles'] });
+              toast.success(data.message);
+            }
+          }
+        );
       }
     });
-
-    if (ok) {
-      console.log('Deleted');
-    }
   };
   return (
     <>
@@ -53,7 +62,7 @@ export default function BlogPage() {
         onAdd={() => navigate('/blog/create-article')}
         enableExport
         addButtonLabel="Create Blog"
-        isLoading={isLoading}
+        isLoading={isLoading || isSingleDeletePending}
         getRowLink={(row) => `/blog/${row.id}`}
         onDeleteRow={(row) => {
           handleDelete(row.slug);

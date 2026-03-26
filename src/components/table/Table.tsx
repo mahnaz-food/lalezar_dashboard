@@ -166,7 +166,7 @@ export default function ReactTable<T>({
             {/* Table Body */}
             <TableBody>
               {isLoading ? (
-                <TableSkeleton columns={columns} />
+                <TableSkeleton columns={columns} numOfAllColumns={table.getAllColumns().length} />
               ) : table.getRowModel().rows.length === 0 ? (
                 <EmptyTable msg={emptyTableMsg || 'Table is empty'} numOfColumns={columns.length} />
               ) : (

@@ -23,7 +23,7 @@ export const createArticle = async (data: ArticleFormValues) => {
   return res.data;
 };
 
-export const deleteArticle = async (id: string) => {
+export const deleteArticle = async ({ id }: { id: string }) => {
   const res = await axios.delete(`${BLOG_BASE_API_ENDPOINT}/${id}`);
   return res.data;
 };

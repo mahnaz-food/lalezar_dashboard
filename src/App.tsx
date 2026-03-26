@@ -27,7 +27,7 @@ export default function App() {
               <AuthProvider>
                 <>
                   <RouterProvider router={router} />
-                  <Toaster richColors position="bottom-right" duration={4000} />
+                  <Toaster richColors position="top-right" duration={4000} />
                 </>
               </AuthProvider>
             </MenuProvider>
