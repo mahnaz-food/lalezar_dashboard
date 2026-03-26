@@ -11,7 +11,9 @@ import {
   ArrowDown2,
   ArrowUp2,
   AddCircle,
-  MinusCirlce
+  MinusCirlce,
+  Link1,
+  ExportSquare
 } from 'iconsax-react';
 
 // Wrap them to match your existing MUI naming
@@ -28,3 +30,5 @@ export const ExpandIcon = (props: any) => <ArrowDown2 {...props} />;
 export const CollapseIcon = (props: any) => <ArrowUp2 {...props} />;
 export const AddItemIcon = (props: any) => <AddCircle {...props} />;
 export const RemoveItemIcon = (props: any) => <MinusCirlce {...props} />;
+export const LinkIcon = (props: any) => <Link1 {...props} />;
+export const ExternalIcon = (props: any) => <ExportSquare {...props} />;

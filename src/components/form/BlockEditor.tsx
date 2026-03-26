@@ -16,10 +16,15 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
-  Collapse
+  Collapse,
+  Switch,
+  FormControlLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Chip
 } from '@mui/material';
-
-import { Block } from 'types/blog';
 import {
   AddItemIcon,
   CollapseIcon,
@@ -27,21 +32,80 @@ import {
   DividerIcon,
   DragIcon,
   ExpandIcon,
+  ExternalIcon,
   HeadingIcon,
   ImageIcon,
+  LinkIcon,
   ListIcon,
   ParagraphIcon,
   QuoteIcon,
   RemoveItemIcon
 } from './BlockEditorIcons';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export type InlineNode =
+  | { type: 'text'; value: string }
+  | { type: 'link'; value: string; href: string; external?: boolean; newTab?: boolean };
+
+export type Block =
+  | { type: 'heading'; level: 1 | 2 | 3 | 4; children: InlineNode[] }
+  | { type: 'paragraph'; children: InlineNode[] }
+  | { type: 'quote'; text: string; author?: string }
+  | { type: 'image'; src: string; caption?: string }
+  | { type: 'list'; items: string[]; ordered?: boolean }
+  | { type: 'link'; href: string; label: string; external?: boolean; newTab?: boolean }
+  | { type: 'divider' };
+
+type BlockType = Block['type'];
 
 interface BlockEditorProps {
   name: string;
 }
 
-type BlockType = Block['type'];
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const inlinesToText = (children: InlineNode[]): string => children.map((n) => n.value).join('');
+
+const createDefaultBlock = (type: BlockType): Block => {
+  switch (type) {
+    case 'heading':
+      return { type: 'heading', level: 2, children: [{ type: 'text', value: '' }] };
+    case 'paragraph':
+      return { type: 'paragraph', children: [{ type: 'text', value: '' }] };
+    case 'quote':
+      return { type: 'quote', text: '', author: '' };
+    case 'image':
+      return { type: 'image', src: '', caption: '' };
+    case 'list':
+      return { type: 'list', items: [''], ordered: false };
+    case 'link':
+      return { type: 'link', href: '', label: '', external: false, newTab: false };
+    case 'divider':
+      return { type: 'divider' };
+  }
+};
+
+const blockSummary = (block: Block): string => {
+  switch (block.type) {
+    case 'heading':
+      return inlinesToText(block.children) || 'Untitled Heading';
+    case 'paragraph': {
+      const text = inlinesToText(block.children);
+      return text ? text.substring(0, 60) + (text.length > 60 ? '…' : '') : 'Empty paragraph';
+    }
+    case 'quote':
+      return block.text || 'Empty quote';
+    case 'image':
+      return block.src || 'No image URL';
+    case 'list':
+      return `${block.items.length} item${block.items.length !== 1 ? 's' : ''}`;
+    case 'link':
+      return block.label || block.href || 'Untitled link';
+    case 'divider':
+      return '— Divider —';
+  }
+};
 
 interface BlockTypeOption {
   type: BlockType;
@@ -50,56 +114,262 @@ interface BlockTypeOption {
   description: string;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
 const BLOCK_TYPES: BlockTypeOption[] = [
   { type: 'heading', label: 'Heading', icon: <HeadingIcon fontSize="small" />, description: 'H1–H4 section title' },
-  { type: 'paragraph', label: 'Paragraph', icon: <ParagraphIcon fontSize="small" />, description: 'Body text block' },
+  { type: 'paragraph', label: 'Paragraph', icon: <ParagraphIcon fontSize="small" />, description: 'Rich text with inline links' },
   { type: 'quote', label: 'Quote', icon: <QuoteIcon fontSize="small" />, description: 'Blockquote with optional author' },
   { type: 'image', label: 'Image', icon: <ImageIcon fontSize="small" />, description: 'Image URL with caption' },
   { type: 'list', label: 'List', icon: <ListIcon fontSize="small" />, description: 'Ordered or unordered list' },
+  { type: 'link', label: 'Link', icon: <LinkIcon fontSize="small" />, description: 'Standalone call-to-action link' },
   { type: 'divider', label: 'Divider', icon: <DividerIcon fontSize="small" />, description: 'Horizontal rule separator' }
 ];
 
-const createDefaultBlock = (type: BlockType): Block => {
-  switch (type) {
-    case 'heading':
-      return { type: 'heading', level: 2, text: '' };
-    case 'paragraph':
-      return { type: 'paragraph', text: '' };
-    case 'quote':
-      return { type: 'quote', text: '', author: '' };
-    case 'image':
-      return { type: 'image', src: '', caption: '' };
-    case 'list':
-      return { type: 'list', items: [''], ordered: false };
-    case 'divider':
-      return { type: 'divider' };
-  }
-};
+// ─── Inline Link Dialog ───────────────────────────────────────────────────────
 
-// ─── Block Preview Label ──────────────────────────────────────────────────────
+interface InlineLinkDialogProps {
+  open: boolean;
+  initial?: { value: string; href: string; external: boolean; newTab: boolean };
+  onConfirm: (link: { value: string; href: string; external: boolean; newTab: boolean }) => void;
+  onClose: () => void;
+}
 
-const blockSummary = (block: Block): string => {
-  switch (block.type) {
-    case 'heading':
-      return block.text || 'Untitled Heading';
-    case 'paragraph':
-      return block.text ? block.text.substring(0, 60) + (block.text.length > 60 ? '…' : '') : 'Empty paragraph';
-    case 'quote':
-      return block.text || 'Empty quote';
-    case 'image':
-      return block.src || 'No image URL';
-    case 'list':
-      return `${block.items.length} item${block.items.length !== 1 ? 's' : ''}`;
-    case 'divider':
-      return '— Divider —';
-  }
-};
+function InlineLinkDialog({ open, initial, onConfirm, onClose }: InlineLinkDialogProps) {
+  const [value, setValue] = useState(initial?.value || '');
+  const [href, setHref] = useState(initial?.href || '');
+  const [external, setExternal] = useState(initial?.external ?? false);
+  const [newTab, setNewTab] = useState(initial?.newTab ?? false);
 
-// ─── Individual Block Editors ─────────────────────────────────────────────────
+  React.useEffect(() => {
+    if (open) {
+      setValue(initial?.value || '');
+      setHref(initial?.href || '');
+      setExternal(initial?.external ?? false);
+      setNewTab(initial?.newTab ?? false);
+    }
+  }, [open]);
 
-interface BlockEditorItemProps {
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <LinkIcon fontSize="small" />
+        {initial ? 'Edit Inline Link' : 'Insert Inline Link'}
+      </DialogTitle>
+      <DialogContent>
+        <Stack spacing={2} sx={{ mt: 1 }}>
+          <TextField
+            label="Link Text"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="e.g. Read more"
+            fullWidth
+            size="small"
+            autoFocus
+          />
+
+          <ToggleButtonGroup
+            exclusive
+            size="small"
+            value={external ? 'external' : 'internal'}
+            onChange={(_, val) => {
+              if (val) setExternal(val === 'external');
+            }}
+          >
+            <ToggleButton value="internal">Internal link</ToggleButton>
+            <ToggleButton value="external">External link</ToggleButton>
+          </ToggleButtonGroup>
+
+          <TextField
+            label={!external ? 'Path (e.g. /articles/my-post)' : 'URL (e.g. https://example.com)'}
+            value={href}
+            onChange={(e) => setHref(e.target.value)}
+            placeholder={!external ? '/articles/my-post' : 'https://example.com'}
+            fullWidth
+            size="small"
+          />
+
+          <FormControlLabel
+            control={<Switch checked={newTab} onChange={(e) => setNewTab(e.target.checked)} size="small" />}
+            label="Open in new tab"
+          />
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="inherit">
+          Cancel
+        </Button>
+        <Button variant="contained" disabled={!value.trim() || !href.trim()} onClick={() => onConfirm({ value, href, external, newTab })}>
+          {initial ? 'Update' : 'Insert'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// ─── Inline Editor ────────────────────────────────────────────────────────────
+// Renders InlineNode[] as alternating text fields and link chips.
+
+interface InlineEditorProps {
+  children: InlineNode[];
+  onChange: (children: InlineNode[]) => void;
+  label?: string;
+  placeholder?: string;
+  multiline?: boolean;
+  minRows?: number;
+  error?: string;
+}
+
+function InlineEditor({ children, onChange, label, placeholder, multiline = false, minRows = 1, error }: InlineEditorProps) {
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [editingLinkIndex, setEditingLinkIndex] = useState<number | null>(null);
+
+  const handleTextChange = (index: number, val: string) => {
+    const updated = [...children];
+    updated[index] = { type: 'text', value: val };
+    onChange(updated);
+  };
+
+  const handleDeleteNode = (index: number) => {
+    // When deleting a link chip, merge surrounding text nodes if both exist
+    const updated = children.filter((_, i) => i !== index);
+    // Collapse adjacent text nodes
+    const collapsed: InlineNode[] = [];
+    for (const node of updated) {
+      const last = collapsed[collapsed.length - 1];
+      if (last?.type === 'text' && node.type === 'text') {
+        collapsed[collapsed.length - 1] = { type: 'text', value: last.value + node.value };
+      } else {
+        collapsed.push(node);
+      }
+    }
+    onChange(collapsed.length ? collapsed : [{ type: 'text', value: '' }]);
+  };
+
+  const handleInsertLink = (link: { value: string; href: string; external: boolean; newTab: boolean }) => {
+    if (editingLinkIndex !== null) {
+      const updated = [...children];
+      updated[editingLinkIndex] = { type: 'link', ...link };
+      onChange(updated);
+    } else {
+      // Append link + trailing empty text node
+      onChange([...children, { type: 'link', ...link }, { type: 'text', value: '' }]);
+    }
+    setLinkDialogOpen(false);
+    setEditingLinkIndex(null);
+  };
+
+  const editingLink =
+    editingLinkIndex !== null && children[editingLinkIndex]?.type === 'link'
+      ? (children[editingLinkIndex] as Extract<InlineNode, { type: 'link' }>)
+      : undefined;
+
+  return (
+    <Box>
+      <Stack spacing={1}>
+        {children.map((node, i) => {
+          if (node.type === 'text') {
+            return (
+              <TextField
+                key={i}
+                size="small"
+                fullWidth
+                multiline={multiline}
+                minRows={minRows}
+                label={i === 0 ? label : undefined}
+                placeholder={i === 0 ? placeholder : 'Continue writing...'}
+                value={node.value}
+                onChange={(e) => handleTextChange(i, e.target.value)}
+              />
+            );
+          }
+
+          // Link chip
+          return (
+            <Box key={i}>
+              <Chip
+                icon={
+                  node.external ? <ExternalIcon sx={{ fontSize: '14px !important' }} /> : <LinkIcon sx={{ fontSize: '14px !important' }} />
+                }
+                label={
+                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                    <Typography variant="caption" fontWeight={700} color="primary.main">
+                      {node.value}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      →
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    >
+                      {node.href}
+                    </Typography>
+                    {node.newTab && (
+                      <Typography variant="caption" color="text.disabled">
+                        (new tab)
+                      </Typography>
+                    )}
+                    {!node.external && <Chip label="internal" size="small" sx={{ height: 16, fontSize: '0.6rem', ml: 0.5 }} />}
+                  </Stack>
+                }
+                variant="outlined"
+                color="primary"
+                size="small"
+                onClick={() => {
+                  setEditingLinkIndex(i);
+                  setLinkDialogOpen(true);
+                }}
+                onDelete={() => handleDeleteNode(i)}
+                sx={{ maxWidth: '100%', height: 'auto', py: 0.75, borderStyle: 'dashed', cursor: 'pointer' }}
+              />
+            </Box>
+          );
+        })}
+      </Stack>
+
+      {error && (
+        <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+          {error}
+        </Typography>
+      )}
+
+      <Button
+        size="small"
+        startIcon={<LinkIcon />}
+        onClick={() => {
+          setEditingLinkIndex(null);
+          setLinkDialogOpen(true);
+        }}
+        sx={{ mt: 1, fontSize: '0.72rem' }}
+      >
+        Insert inline link
+      </Button>
+
+      <InlineLinkDialog
+        open={linkDialogOpen}
+        initial={
+          editingLink
+            ? {
+                value: editingLink.value,
+                href: editingLink.href,
+                external: editingLink.external ?? false,
+                newTab: editingLink.newTab ?? false
+              }
+            : undefined
+        }
+        onConfirm={handleInsertLink}
+        onClose={() => {
+          setLinkDialogOpen(false);
+          setEditingLinkIndex(null);
+        }}
+      />
+    </Box>
+  );
+}
+
+// ─── Block Item ───────────────────────────────────────────────────────────────
+
+interface BlockItemProps {
   block: Block;
   index: number;
   onChange: (index: number, block: Block) => void;
@@ -110,11 +380,14 @@ interface BlockEditorItemProps {
   isLast: boolean;
 }
 
-function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isFirst, isLast }: BlockEditorItemProps) {
+function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isFirst, isLast }: BlockItemProps) {
   const [expanded, setExpanded] = useState(true);
+  const {
+    formState: { errors }
+  } = useFormContext();
 
+  const blockErrors = (errors.content as any)?.[index];
   const blockOption = BLOCK_TYPES.find((b) => b.type === block.type)!;
-
   const update = (patch: Partial<Block>) => onChange(index, { ...block, ...patch } as Block);
 
   const renderEditor = () => {
@@ -132,28 +405,26 @@ function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isF
                 ))}
               </Select>
             </FormControl>
-            <TextField
-              fullWidth
+            <InlineEditor
+              children={block.children}
+              onChange={(children) => update({ children })}
               label="Heading Text"
-              value={block.text}
-              onChange={(e) => update({ text: e.target.value })}
               placeholder="Enter heading text..."
-              size="small"
+              error={blockErrors?.children?.message}
             />
           </Stack>
         );
 
       case 'paragraph':
         return (
-          <TextField
-            fullWidth
+          <InlineEditor
+            children={block.children}
+            onChange={(children) => update({ children })}
+            label="Paragraph Text"
+            placeholder="Write your paragraph here..."
             multiline
             minRows={3}
-            label="Paragraph Text"
-            value={block.text}
-            onChange={(e) => update({ text: e.target.value })}
-            placeholder="Write your paragraph here..."
-            size="small"
+            error={blockErrors?.children?.message}
           />
         );
 
@@ -165,18 +436,19 @@ function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isF
               multiline
               minRows={2}
               label="Quote Text"
+              size="small"
               value={block.text}
               onChange={(e) => update({ text: e.target.value })}
               placeholder="Enter the quote..."
-              size="small"
+              error={!!blockErrors?.text?.message}
             />
             <TextField
               fullWidth
               label="Author (optional)"
+              size="small"
               value={block.author || ''}
               onChange={(e) => update({ author: e.target.value })}
               placeholder="Quote attribution..."
-              size="small"
             />
           </Stack>
         );
@@ -187,10 +459,11 @@ function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isF
             <TextField
               fullWidth
               label="Image URL"
+              size="small"
               value={block.src}
               onChange={(e) => update({ src: e.target.value })}
               placeholder="https://example.com/image.jpg"
-              size="small"
+              error={!!blockErrors?.src?.message}
             />
             {block.src && (
               <Box
@@ -206,10 +479,10 @@ function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isF
             <TextField
               fullWidth
               label="Caption (optional)"
+              size="small"
               value={block.caption || ''}
               onChange={(e) => update({ caption: e.target.value })}
               placeholder="Image caption..."
-              size="small"
             />
           </Stack>
         );
@@ -228,6 +501,12 @@ function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isF
               <ToggleButton value="unordered">Unordered</ToggleButton>
               <ToggleButton value="ordered">Ordered</ToggleButton>
             </ToggleButtonGroup>
+            {/* Array-level error (e.g. "must have at least one item") */}
+            {(blockErrors?.items?.message || blockErrors?.items?.root?.message) && (
+              <Typography variant="caption" color="error">
+                {blockErrors?.items?.message ?? blockErrors?.items?.root?.message}
+              </Typography>
+            )}
             <Stack spacing={1}>
               {block.items.map((item, i) => (
                 <Stack key={i} direction="row" spacing={1} alignItems="center">
@@ -238,21 +517,23 @@ function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isF
                     fullWidth
                     size="small"
                     value={item}
+                    placeholder={`Item ${i + 1}`}
+                    error={!!blockErrors?.items?.[i]?.message}
+                    helperText={blockErrors?.items?.[i]?.message}
                     onChange={(e) => {
                       const items = [...block.items];
                       items[i] = e.target.value;
                       update({ items });
                     }}
-                    placeholder={`Item ${i + 1}`}
                   />
                   <IconButton
                     size="small"
                     color="error"
+                    disabled={block.items.length === 1}
                     onClick={() => {
                       const items = block.items.filter((_, idx) => idx !== i);
                       update({ items: items.length ? items : [''] });
                     }}
-                    disabled={block.items.length === 1}
                   >
                     <RemoveItemIcon fontSize="small" />
                   </IconButton>
@@ -261,12 +542,53 @@ function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isF
               <Button
                 size="small"
                 startIcon={<AddItemIcon />}
-                onClick={() => update({ items: [...block.items, ''] })}
                 sx={{ alignSelf: 'flex-start' }}
+                onClick={() => update({ items: [...block.items, ''] })}
               >
                 Add Item
               </Button>
             </Stack>
+          </Stack>
+        );
+
+      case 'link':
+        return (
+          <Stack spacing={2}>
+            <TextField
+              fullWidth
+              label="Link Label"
+              size="small"
+              value={block.label}
+              onChange={(e) => update({ label: e.target.value })}
+              placeholder="e.g. Read our privacy policy"
+              error={!!blockErrors?.label?.message}
+              helperText={blockErrors?.label?.message}
+            />
+            <ToggleButtonGroup
+              exclusive
+              size="small"
+              value={block.external ? 'external' : 'internal'}
+              onChange={(_, val) => {
+                if (val) update({ external: val === 'external' });
+              }}
+            >
+              <ToggleButton value="internal">Internal link</ToggleButton>
+              <ToggleButton value="external">External link</ToggleButton>
+            </ToggleButtonGroup>
+            <TextField
+              fullWidth
+              size="small"
+              label={block.external ? 'URL (e.g. https://example.com)' : 'Path (e.g. /articles/my-post)'}
+              value={block.href}
+              onChange={(e) => update({ href: e.target.value })}
+              placeholder={block.external ? 'https://example.com' : '/articles/my-post'}
+              error={!!blockErrors?.href?.message}
+              helperText={blockErrors?.href?.message}
+            />
+            <FormControlLabel
+              control={<Switch checked={block.newTab ?? false} size="small" onChange={(e) => update({ newTab: e.target.checked })} />}
+              label="Open in new tab"
+            />
           </Stack>
         );
 
@@ -283,16 +605,8 @@ function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isF
   };
 
   return (
-    <Paper
-      variant="outlined"
-      sx={{
-        borderRadius: 2,
-        overflow: 'hidden',
-        transition: 'box-shadow 0.2s',
-        '&:hover': { boxShadow: 2 }
-      }}
-    >
-      {/* Block Header */}
+    <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 2 } }}>
+      {/* Header */}
       <Stack
         direction="row"
         alignItems="center"
@@ -307,21 +621,14 @@ function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isF
         }}
         onClick={() => setExpanded(!expanded)}
       >
-        {/* Drag handle (visual only) */}
         <DragIcon sx={{ color: 'text.disabled', fontSize: 18, flexShrink: 0 }} />
-
-        {/* Block type icon + label */}
         <Box sx={{ color: 'primary.main', display: 'flex', alignItems: 'center' }}>{blockOption.icon}</Box>
         <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
           {blockOption.label}
         </Typography>
-
-        {/* Preview text */}
         <Typography variant="body2" color="text.secondary" noWrap sx={{ flex: 1, fontStyle: 'italic' }}>
           {!expanded && blockSummary(block)}
         </Typography>
-
-        {/* Actions */}
         <Stack direction="row" spacing={0.5} onClick={(e) => e.stopPropagation()}>
           <Tooltip title="Move Up">
             <span>
@@ -352,7 +659,7 @@ function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isF
         </Stack>
       </Stack>
 
-      {/* Block Content */}
+      {/* Body */}
       <Collapse in={expanded}>
         <Box sx={{ p: 2 }}>{renderEditor()}</Box>
       </Collapse>
@@ -362,11 +669,7 @@ function BlockItem({ block, index, onChange, onDelete, onMoveUp, onMoveDown, isF
 
 // ─── Add Block Menu ───────────────────────────────────────────────────────────
 
-interface AddBlockMenuProps {
-  onAdd: (type: BlockType) => void;
-}
-
-function AddBlockMenu({ onAdd }: AddBlockMenuProps) {
+function AddBlockMenu({ onAdd }: { onAdd: (type: BlockType) => void }) {
   return (
     <Box
       sx={{
@@ -393,13 +696,7 @@ function AddBlockMenu({ onAdd }: AddBlockMenuProps) {
               variant="outlined"
               startIcon={icon}
               onClick={() => onAdd(type)}
-              sx={{
-                borderRadius: 2,
-                textTransform: 'none',
-                fontSize: '0.75rem',
-                px: 1.5,
-                py: 0.5
-              }}
+              sx={{ borderRadius: 2, textTransform: 'none', fontSize: '0.75rem', px: 1.5, py: 0.5 }}
             >
               {label}
             </Button>
@@ -422,39 +719,31 @@ export function BlockEditor({ name }: BlockEditorProps) {
 
   const setBlocks = (updated: Block[]) => setValue(name, updated, { shouldValidate: true, shouldDirty: true });
 
-  const handleAdd = (type: BlockType) => {
-    setBlocks([...blocks, createDefaultBlock(type)]);
-  };
-
+  const handleAdd = (type: BlockType) => setBlocks([...blocks, createDefaultBlock(type)]);
   const handleChange = (index: number, block: Block) => {
-    const updated = [...blocks];
-    updated[index] = block;
-    setBlocks(updated);
+    const u = [...blocks];
+    u[index] = block;
+    setBlocks(u);
   };
-
-  const handleDelete = (index: number) => {
-    setBlocks(blocks.filter((_, i) => i !== index));
-  };
-
+  const handleDelete = (index: number) => setBlocks(blocks.filter((_, i) => i !== index));
   const handleMoveUp = (index: number) => {
     if (index === 0) return;
-    const updated = [...blocks];
-    [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
-    setBlocks(updated);
+    const u = [...blocks];
+    [u[index - 1], u[index]] = [u[index], u[index - 1]];
+    setBlocks(u);
   };
-
   const handleMoveDown = (index: number) => {
     if (index === blocks.length - 1) return;
-    const updated = [...blocks];
-    [updated[index], updated[index + 1]] = [updated[index + 1], updated[index]];
-    setBlocks(updated);
+    const u = [...blocks];
+    [u[index], u[index + 1]] = [u[index + 1], u[index]];
+    setBlocks(u);
   };
 
   const error = errors[name];
+  console.log(error);
 
   return (
     <Box>
-      {/* Section Header */}
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
         <Box>
           <Typography variant="subtitle1" fontWeight={600}>
@@ -471,14 +760,12 @@ export function BlockEditor({ name }: BlockEditorProps) {
         )}
       </Stack>
 
-      {/* Error */}
       {error && (
         <Typography variant="caption" color="error" sx={{ display: 'block', mb: 1 }}>
-          {String(error.message)}
+          Block have error
         </Typography>
       )}
 
-      {/* Block List */}
       <Stack spacing={1.5} mb={2}>
         {blocks.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 4, color: 'text.disabled' }}>
@@ -502,7 +789,6 @@ export function BlockEditor({ name }: BlockEditorProps) {
         )}
       </Stack>
 
-      {/* Add Block Menu */}
       <AddBlockMenu onAdd={handleAdd} />
     </Box>
   );
