@@ -712,8 +712,8 @@ function AddBlockMenu({ onAdd }: { onAdd: (type: BlockType) => void }) {
 export function BlockEditor({ name }: BlockEditorProps) {
   const {
     setValue,
-    watch,
-    formState: { errors }
+    watch
+    // formState: { errors }
   } = useFormContext();
   const blocks: Block[] = watch(name) || [];
 
@@ -739,8 +739,7 @@ export function BlockEditor({ name }: BlockEditorProps) {
     setBlocks(u);
   };
 
-  const error = errors[name];
-  console.log(error);
+  // const error = errors[name];
 
   return (
     <Box>
@@ -760,11 +759,11 @@ export function BlockEditor({ name }: BlockEditorProps) {
         )}
       </Stack>
 
-      {error && (
+      {/* {error && (
         <Typography variant="caption" color="error" sx={{ display: 'block', mb: 1 }}>
-          Block have error
+          Blocks section has error
         </Typography>
-      )}
+      )} */}
 
       <Stack spacing={1.5} mb={2}>
         {blocks.length === 0 ? (

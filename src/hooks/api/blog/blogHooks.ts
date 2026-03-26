@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { getArticles, getBlogCategories, getBlogTags } from './blogApi';
-import { IGetArticlesParams } from 'types/blog';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { createArticle, getArticles, getBlogCategories, getBlogTags } from './blogApi';
+import { ArticleFormValues, IGetArticlesParams } from 'types/blog';
 
 export const useGetArticlesQuery = (params?: IGetArticlesParams) => {
   const queryKey = ['articles', params?.page, params?.limit, params?.query, params?.category];
@@ -23,5 +23,13 @@ export const useGetBlogTagsQuery = () => {
   return useQuery({
     queryKey,
     queryFn: () => getBlogTags()
+  });
+};
+
+export const useCreateArticleMutation = () => {
+  const mutationKey = ['create-article'];
+  return useMutation({
+    mutationKey,
+    mutationFn: (data: ArticleFormValues) => createArticle(data)
   });
 };

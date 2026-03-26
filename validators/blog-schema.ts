@@ -86,8 +86,9 @@ export const createArticleSchema = z.object({
   isFeatured: z.boolean().default(false),
   isPublished: z.boolean().default(true),
   content: z.array(blockSchema).optional(),
-  categoryIds: z.array(z.string().uuid('Invalid category ID')).min(1, 'Select at least one category'),
-  tagIds: z.array(z.string().uuid('Invalid tag ID')).optional(),
+  categories: z.array(z.string().uuid('Invalid category ID')).min(1, 'Select at least one category'),
+  tags: z.array(z.string().uuid('Invalid tag ID')).optional(),
   metaTitle: z.string().optional(),
-  metaDescription: z.string().optional()
+  metaDescription: z.string().optional(),
+  readingTime: z.number().optional()
 });

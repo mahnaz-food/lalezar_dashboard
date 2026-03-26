@@ -22,7 +22,23 @@ export function FormTextField<T extends FieldValues>({ name, label, ...inputProp
         <Stack spacing={1}>
           {label && <InputLabel htmlFor={name}>{label}</InputLabel>}
 
-          <OutlinedInput {...field} {...inputProps} id={name} error={!!fieldState.error} fullWidth />
+          <OutlinedInput
+            {...field}
+            {...inputProps}
+            id={name}
+            error={!!fieldState.error}
+            fullWidth
+            type={inputProps.type}
+            onChange={(e) => {
+              const value = e.target.value;
+
+              if (inputProps.type === 'number') {
+                field.onChange(value === '' ? undefined : Number(value));
+              } else {
+                field.onChange(value);
+              }
+            }}
+          />
 
           {fieldState.error && <FormHelperText error>{fieldState.error.message}</FormHelperText>}
         </Stack>

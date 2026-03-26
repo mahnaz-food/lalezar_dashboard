@@ -1,7 +1,6 @@
 import { Grid } from '@mui/material';
 import { FormProvider, SubmitHandler, useForm, FieldValues, DefaultValues, UseFormReturn, Path } from 'react-hook-form';
 import { FormTextField } from './FormTextField';
-import AnimateButton from 'components/@extended/AnimateButton';
 import Button from '@mui/material/Button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ZodTypeAny } from 'zod';
@@ -9,7 +8,7 @@ import { FormSingleSelect, IOption } from './FormSingleSelect';
 import { FormSwitch } from './FormSwitch';
 import { FormMultiSelect } from './FormMulitSelect';
 
-export type FieldType = 'text' | 'multiLineText' | 'password' | 'select' | 'multiselect' | 'switch';
+export type FieldType = 'text' | 'number' | 'multiLineText' | 'password' | 'select' | 'multiselect' | 'switch';
 
 export type FormFieldConfig<T extends FieldValues> = {
   name: Path<T>;
@@ -90,6 +89,10 @@ export function AppForm<T extends FieldValues>({
             disabled={field.disabled}
           />
         );
+
+      case 'number':
+        return <FormTextField<T> name={field.name} label={field.label} type="number" />;
+
       case 'multiLineText':
         return (
           <FormTextField<T>
@@ -128,19 +131,17 @@ export function AppForm<T extends FieldValues>({
           ))}
 
           <Grid item xs={12}>
-            <AnimateButton>
-              <Button
-                disableElevation
-                disabled={isSubmitting || isPending}
-                fullWidth={isButtonFullwidth}
-                size="large"
-                type="submit"
-                variant="contained"
-                color="primary"
-              >
-                {submitLabel}
-              </Button>
-            </AnimateButton>
+            <Button
+              disableElevation
+              disabled={isSubmitting || isPending}
+              fullWidth={isButtonFullwidth}
+              size="large"
+              type="submit"
+              variant="contained"
+              color="primary"
+            >
+              {submitLabel}
+            </Button>
           </Grid>
         </Grid>
       </form>
