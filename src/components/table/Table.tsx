@@ -21,7 +21,7 @@ import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import { CSVExport, EmptyTable } from 'components/third-party/react-table';
 import { Add, Trash, Eye } from 'iconsax-react';
-import TableSkeleton from './TableSkeleton';
+import TableSkeleton from '../skeleton/TableSkeleton';
 
 interface ReactTableProps<T> {
   data: T[];

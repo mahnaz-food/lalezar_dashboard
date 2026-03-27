@@ -1,5 +1,5 @@
 import { AppForm, FormFieldConfig } from 'components/form/AppFrom';
-import { ArticleFormValues } from 'types/blog';
+import { ArticleDetails, ArticleFormValues } from 'types/blog';
 import { createArticleSchema } from '../../../validators/blog-schema';
 import { BlockEditor } from 'components/form/BlockEditor';
 import { useCreateArticleMutation, useGetBlogCategoriesQuery, useGetBlogTagsQuery } from 'hooks/api/blog/blogHooks';
@@ -7,10 +7,12 @@ import { IOption } from 'components/form/FormSingleSelect';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
+import FormSkeleton from 'components/skeleton/FormSkeleton';
 
 const defaultValues: ArticleFormValues = {
   title: '',
   subtitle: '',
+  readingTime: 0,
   excerpt: '',
   metaTitle: '',
   metaDescription: '',
@@ -22,7 +24,12 @@ const defaultValues: ArticleFormValues = {
   tags: []
 };
 
-export default function ArticleForm() {
+interface ArticleFormProps {
+  article?: ArticleDetails;
+  isLoading?: boolean;
+}
+
+export default function ArticleForm({ article, isLoading }: ArticleFormProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { data: categories, isLoading: isLoadingCategories } = useGetBlogCategoriesQuery();
@@ -56,6 +63,25 @@ export default function ArticleForm() {
     [categoryOptions, isLoadingCategories, isLoadingTags, tagOptions]
   );
 
+  const formValues: ArticleFormValues = useMemo(() => {
+    if (!article) return defaultValues;
+
+    return {
+      title: article.title,
+      subtitle: article.subtitle ?? '',
+      readingTime: article.readingTime ?? undefined,
+      excerpt: article.excerpt ?? '',
+      metaTitle: article.metaTitle ?? '',
+      metaDescription: article.metaDescription ?? '',
+      image: article.image ?? '',
+      content: article.content ?? undefined,
+      isFeatured: article.isFeatured ?? false,
+      isPublished: article.isPublished ?? true,
+      categories: article.categories.map((c) => c.id),
+      tags: article.tags.map((tag) => tag.id) ?? undefined
+    };
+  }, [article]);
+
   const onSubmit = async (data: ArticleFormValues) => {
     mutate(data, {
       onSuccess: () => {
@@ -66,16 +92,20 @@ export default function ArticleForm() {
   };
   return (
     <>
-      <AppForm
-        fields={fields}
-        defaultValues={defaultValues}
-        onSubmit={onSubmit}
-        schema={createArticleSchema}
-        submitLabel="Create Article"
-        isPending={isPending}
-      >
-        <BlockEditor name="content" />
-      </AppForm>
+      {isLoading ? (
+        <FormSkeleton hasBlockEditor fields={fields.map((f) => (f.md ? { md: f.md } : { md: 12 }))} />
+      ) : (
+        <AppForm
+          fields={fields}
+          defaultValues={formValues}
+          onSubmit={onSubmit}
+          schema={createArticleSchema}
+          submitLabel="Create Article"
+          isPending={isPending}
+        >
+          <BlockEditor name="content" />
+        </AppForm>
+      )}
     </>
   );
 }

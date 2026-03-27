@@ -1,15 +1,14 @@
 import { z } from 'zod';
 import { IBaseQueryParams } from './api';
-import { createArticleSchema } from '../../validators/blog-schema';
+import { blockSchema, createArticleSchema } from '../../validators/blog-schema';
 
 export interface IGetArticlesParams extends IBaseQueryParams {
   category?: string;
 }
 
-export interface IArticle {
+export interface ArticleSummary {
   id: string;
   title: string;
-  content: Block[];
   slug: string;
   subtitle: string;
   excerpt: null | string;
@@ -40,12 +39,12 @@ export interface IBlogTag {
   createdAt: string;
 }
 
-export type Block =
-  | { type: 'heading'; level: 1 | 2 | 3 | 4; text: string }
-  | { type: 'paragraph'; text: string }
-  | { type: 'quote'; text: string; author?: string }
-  | { type: 'image'; src: string; caption?: string }
-  | { type: 'list'; items: string[]; ordered?: boolean }
-  | { type: 'divider' };
+export type Block = z.infer<typeof blockSchema>;
 
 export type ArticleFormValues = z.infer<typeof createArticleSchema>;
+
+export interface ArticleDetails extends ArticleSummary {
+  content: Block[];
+  isFeatured: boolean;
+  isPublished: boolean;
+}

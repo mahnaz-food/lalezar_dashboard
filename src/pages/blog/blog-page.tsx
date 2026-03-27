@@ -5,9 +5,9 @@ import { toast } from 'sonner';
 import ReactTable from 'components/table/Table';
 import { useModal } from 'contexts/ModalContext';
 import { useDeleteArticleMutation, useGetArticlesQuery } from 'hooks/api/blog/blogHooks';
-import { IArticle } from 'types/blog';
+import { ArticleSummary } from 'types/blog';
 
-export const columns: ColumnDef<IArticle>[] = [
+export const columns: ColumnDef<ArticleSummary>[] = [
   {
     accessorKey: 'title',
     header: 'Title'
@@ -57,13 +57,13 @@ export default function BlogPage() {
     <>
       <ReactTable
         data={formatted}
-        columns={columns as IArticle[]}
+        columns={columns as ArticleSummary[]}
         tableTitle="Articles List"
         onAdd={() => navigate('/blog/create-article')}
         enableExport
         addButtonLabel="Create Blog"
         isLoading={isLoading || isSingleDeletePending}
-        getRowLink={(row) => `/blog/${row.id}`}
+        getRowLink={(row) => `/blog/${row.slug}`}
         onDeleteRow={(row) => {
           handleDelete(row.slug);
         }}

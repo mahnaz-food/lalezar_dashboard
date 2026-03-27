@@ -80,15 +80,15 @@ export const blockSchema = z.discriminatedUnion('type', [
 
 export const createArticleSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  subtitle: z.string().optional(),
-  excerpt: z.string().optional(),
-  image: z.string().url('Invalid image URL').optional().or(z.literal('')),
+  subtitle: z.string().default(''),
+  excerpt: z.string().default(''),
+  image: z.string().url('Invalid image URL').default(''),
   isFeatured: z.boolean().default(false),
   isPublished: z.boolean().default(true),
   content: z.array(blockSchema).optional(),
   categories: z.array(z.string().uuid('Invalid category ID')).min(1, 'Select at least one category'),
   tags: z.array(z.string().uuid('Invalid tag ID')).optional(),
-  metaTitle: z.string().optional(),
-  metaDescription: z.string().optional(),
+  metaTitle: z.string().default(''),
+  metaDescription: z.string().default(''),
   readingTime: z.number().optional()
 });

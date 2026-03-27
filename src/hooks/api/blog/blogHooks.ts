@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { createArticle, deleteArticle, getArticles, getBlogCategories, getBlogTags } from './blogApi';
+import { createArticle, deleteArticle, getArticleBySlug, getArticles, getBlogCategories, getBlogTags } from './blogApi';
 import { ArticleFormValues, IGetArticlesParams } from 'types/blog';
 
 export const useGetArticlesQuery = (params?: IGetArticlesParams) => {
@@ -7,6 +7,17 @@ export const useGetArticlesQuery = (params?: IGetArticlesParams) => {
   return useQuery({
     queryKey,
     queryFn: () => getArticles(params)
+  });
+};
+
+export const useGetArticleBySlugQuery = ({ slug }: { slug?: string }) => {
+  return useQuery({
+    queryKey: ['article', slug],
+    queryFn: () => {
+      if (!slug) throw new Error('slug is required');
+      return getArticleBySlug({ slug });
+    },
+    enabled: !!slug
   });
 };
 
