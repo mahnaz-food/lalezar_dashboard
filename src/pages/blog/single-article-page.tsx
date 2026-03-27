@@ -8,7 +8,7 @@ export default function SingleArticlePage() {
 
   return (
     <>
-      <ArticleForm article={article} isLoading={isLoading} />
+      <ArticleForm article={article} isLoading={isLoading} slug={slug} />
     </>
   );
 }

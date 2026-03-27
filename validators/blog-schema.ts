@@ -82,7 +82,7 @@ export const createArticleSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   subtitle: z.string().default(''),
   excerpt: z.string().default(''),
-  image: z.string().url('Invalid image URL').default(''),
+  image: z.string().url('Invalid image URL').optional().or(z.literal('')),
   isFeatured: z.boolean().default(false),
   isPublished: z.boolean().default(true),
   content: z.array(blockSchema).optional(),

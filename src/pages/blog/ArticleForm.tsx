@@ -2,21 +2,27 @@ import { AppForm, FormFieldConfig } from 'components/form/AppFrom';
 import { ArticleDetails, ArticleFormValues } from 'types/blog';
 import { createArticleSchema } from '../../../validators/blog-schema';
 import { BlockEditor } from 'components/form/BlockEditor';
-import { useCreateArticleMutation, useGetBlogCategoriesQuery, useGetBlogTagsQuery } from 'hooks/api/blog/blogHooks';
+import {
+  useCreateArticleMutation,
+  useGetBlogCategoriesQuery,
+  useGetBlogTagsQuery,
+  useUpdateArticleMutation
+} from 'hooks/api/blog/blogHooks';
 import { IOption } from 'components/form/FormSingleSelect';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import FormSkeleton from 'components/skeleton/FormSkeleton';
+import { toast } from 'sonner';
 
 const defaultValues: ArticleFormValues = {
   title: '',
   subtitle: '',
-  readingTime: 0,
+  readingTime: undefined,
   excerpt: '',
   metaTitle: '',
   metaDescription: '',
-  image: '',
+  image: undefined,
   content: [],
   isFeatured: false,
   isPublished: true,
@@ -27,14 +33,16 @@ const defaultValues: ArticleFormValues = {
 interface ArticleFormProps {
   article?: ArticleDetails;
   isLoading?: boolean;
+  slug?: string;
 }
 
-export default function ArticleForm({ article, isLoading }: ArticleFormProps) {
+export default function ArticleForm({ article, isLoading, slug }: ArticleFormProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { data: categories, isLoading: isLoadingCategories } = useGetBlogCategoriesQuery();
   const { data: tags, isLoading: isLoadingTags } = useGetBlogTagsQuery();
-  const { mutate, isPending } = useCreateArticleMutation();
+  const { mutate: createArticle, isPending: isCreating } = useCreateArticleMutation();
+  const { mutate: updateArticle, isPending: isUpdating } = useUpdateArticleMutation();
 
   const categoryOptions: IOption[] = (categories ?? []).map((c) => ({
     label: c.name,
@@ -73,7 +81,7 @@ export default function ArticleForm({ article, isLoading }: ArticleFormProps) {
       excerpt: article.excerpt ?? '',
       metaTitle: article.metaTitle ?? '',
       metaDescription: article.metaDescription ?? '',
-      image: article.image ?? '',
+      image: article.image ?? undefined,
       content: article.content ?? undefined,
       isFeatured: article.isFeatured ?? false,
       isPublished: article.isPublished ?? true,
@@ -83,12 +91,27 @@ export default function ArticleForm({ article, isLoading }: ArticleFormProps) {
   }, [article]);
 
   const onSubmit = async (data: ArticleFormValues) => {
-    mutate(data, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['articles'] });
-        navigate('/blog');
-      }
-    });
+    if (article && slug) {
+      // Update mode
+      updateArticle(
+        { slug, data },
+        {
+          onSuccess: (data: { message: string }) => {
+            toast.success(data.message);
+            queryClient.invalidateQueries({ queryKey: ['article', slug] });
+          }
+        }
+      );
+    } else {
+      // Create mode
+      createArticle(data, {
+        onSuccess: (data: { message: string }) => {
+          toast.success(data.message);
+          queryClient.invalidateQueries({ queryKey: ['articles'] });
+          navigate('/blog');
+        }
+      });
+    }
   };
   return (
     <>
@@ -100,8 +123,8 @@ export default function ArticleForm({ article, isLoading }: ArticleFormProps) {
           defaultValues={formValues}
           onSubmit={onSubmit}
           schema={createArticleSchema}
-          submitLabel="Create Article"
-          isPending={isPending}
+          submitLabel={article ? 'Update Article' : 'Create Article'}
+          isPending={isCreating || isUpdating}
         >
           <BlockEditor name="content" />
         </AppForm>

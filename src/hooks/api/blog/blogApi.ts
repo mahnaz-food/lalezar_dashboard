@@ -28,6 +28,11 @@ export const createArticle = async (data: ArticleFormValues) => {
   return res.data;
 };
 
+export const updateArticle = async ({ slug, data }: { slug: string; data: ArticleFormValues }) => {
+  const res = await axios.put(`${BLOG_BASE_API_ENDPOINT}/${slug}`, data);
+  return res.data;
+};
+
 export const deleteArticle = async ({ id }: { id: string }) => {
   const res = await axios.delete(`${BLOG_BASE_API_ENDPOINT}/${id}`);
   return res.data;
