@@ -10,6 +10,7 @@ import DashboardPage from 'pages/dashboard';
 import SingleArticlePage from 'pages/blog/article/single-article-page';
 import ArticleCategoryPage from 'pages/blog/article-categories/categories-page';
 import CreateArticlePage from 'pages/blog/article/create-article-page';
+import ArticleTagsPage from 'pages/blog/article-tags/tags-page';
 
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
 const MaintenanceError500 = Loadable(lazy(() => import('pages/maintenance/error/500')));
@@ -49,6 +50,10 @@ const MainRoutes = {
         {
           path: '/article-category',
           element: <ArticleCategoryPage />
+        },
+        {
+          path: '/article-tag',
+          element: <ArticleTagsPage />
         },
         {
           path: '/users',

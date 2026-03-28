@@ -2,16 +2,19 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   createArticle,
   createCategory,
+  createTag,
   deleteArticle,
   deleteCategory,
+  deleteTag,
   getArticleBySlug,
   getArticles,
   getBlogCategories,
   getBlogTags,
   updateArticle,
-  updateCategory
+  updateCategory,
+  updateTag
 } from './blogApi';
-import { ArticleCategoryFormValues, ArticleFormValues, IGetArticlesParams } from 'types/blog';
+import { ArticleCategoryFormValues, ArticleFormValues, ArticleTagFormValues, IGetArticlesParams } from 'types/blog';
 
 export const useGetArticlesQuery = (params?: IGetArticlesParams) => {
   const queryKey = ['articles', params?.page, params?.limit, params?.query, params?.category];
@@ -89,5 +92,26 @@ export const useDeleteArticleCategoryMutation = () => {
   return useMutation({
     mutationKey: ['delete-article-category'],
     mutationFn: ({ id }: { id: string }) => deleteCategory({ id })
+  });
+};
+
+export const useCreateArticleTagMutation = () => {
+  return useMutation({
+    mutationKey: ['create-article-tag'],
+    mutationFn: (data: ArticleTagFormValues) => createTag(data)
+  });
+};
+
+export const useUpdateArticleTagMutation = () => {
+  return useMutation({
+    mutationKey: ['update-article-tag'],
+    mutationFn: ({ id, data }: { id: string; data: ArticleTagFormValues }) => updateTag({ id, data })
+  });
+};
+
+export const useDeleteArticleTagMutation = () => {
+  return useMutation({
+    mutationKey: ['delete-article-tag'],
+    mutationFn: ({ id }: { id: string }) => deleteTag({ id })
   });
 };

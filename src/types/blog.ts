@@ -16,7 +16,7 @@ export interface ArticleSummary {
   readingTime: null | number;
   views: number;
   categories: BlogCategory[];
-  tags: IBlogTag[];
+  tags: BlogTag[];
   createdAt: string;
   updatedAt: string;
   metaTitle: string;
@@ -32,7 +32,7 @@ export interface BlogCategory {
   articleCount: number;
 }
 
-export interface IBlogTag {
+export interface BlogTag {
   id: string;
   name: string;
   slug: string;

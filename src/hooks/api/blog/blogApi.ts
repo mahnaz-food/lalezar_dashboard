@@ -4,8 +4,9 @@ import {
   ArticleDetails,
   ArticleFormValues,
   ArticleSummary,
+  ArticleTagFormValues,
   BlogCategory,
-  IBlogTag,
+  BlogTag,
   IGetArticlesParams
 } from 'types/blog';
 import axios from 'utils/axios';
@@ -26,7 +27,7 @@ export const getBlogCategories = async (): Promise<BlogCategory[]> => {
   return res.data;
 };
 
-export const getBlogTags = async (): Promise<IBlogTag[]> => {
+export const getBlogTags = async (): Promise<BlogTag[]> => {
   const res = await axios.get(`${BLOG_BASE_API_ENDPOINT}/tags`);
   return res.data;
 };
@@ -58,5 +59,20 @@ export const updateCategory = async ({ id, data }: { id: string; data: ArticleCa
 
 export const deleteCategory = async ({ id }: { id: string }) => {
   const res = await axios.delete(`${BLOG_BASE_API_ENDPOINT}/categories/${id}`);
+  return res.data;
+};
+
+export const createTag = async (data: ArticleTagFormValues) => {
+  const res = await axios.post(`${BLOG_BASE_API_ENDPOINT}/tags`, data);
+  return res.data;
+};
+
+export const updateTag = async ({ id, data }: { id: string; data: ArticleTagFormValues }) => {
+  const res = await axios.put(`${BLOG_BASE_API_ENDPOINT}/tags/${id}`, data);
+  return res.data;
+};
+
+export const deleteTag = async ({ id }: { id: string }) => {
+  const res = await axios.delete(`${BLOG_BASE_API_ENDPOINT}/tags/${id}`);
   return res.data;
 };
