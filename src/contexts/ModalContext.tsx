@@ -6,6 +6,7 @@ import { createContext, useContext, useState } from 'react';
 interface IConfirmOptions {
   title?: string;
   description?: string;
+  isPending?: boolean;
   onConfirm: () => Promise<void> | void;
 }
 
@@ -15,6 +16,7 @@ interface IFormOptions<T = any> {
   onSubmit: (data: T) => Promise<void> | void;
   fields: any;
   schema: any;
+  isPending?: boolean;
 }
 
 interface IModalContext {
@@ -37,7 +39,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
     resolve: (value: boolean) => void;
   } | null>(null);
 
-  //   Form state
+  // Form state
   const [formState, setFormState] = useState<IFormOptions<any> | null>(null);
 
   // Confirm (Promise-based)
@@ -47,7 +49,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // ✅ Open Form
+  // Open Form
   const openForm = <T,>(options: IFormOptions<T>) => {
     setFormState(options);
   };
@@ -85,6 +87,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
         open={!!confirmState}
         title={confirmState?.options.title}
         description={confirmState?.options.description}
+        isPending={confirmState?.options.isPending}
         onClose={handleConfirmClose}
         onConfirm={handleConfirm}
       />
@@ -97,6 +100,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
             onSubmit={handleFormSubmit}
             fields={formState.fields}
             schema={formState.schema}
+            isPending={formState.isPending}
           />
         </FormModal>
       )}

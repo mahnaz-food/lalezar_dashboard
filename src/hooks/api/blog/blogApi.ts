@@ -1,5 +1,13 @@
 import { IPaginated } from 'types/api';
-import { ArticleDetails, ArticleFormValues, ArticleSummary, IBlogCategory, IBlogTag, IGetArticlesParams } from 'types/blog';
+import {
+  ArticleCategoryFormValues,
+  ArticleDetails,
+  ArticleFormValues,
+  ArticleSummary,
+  BlogCategory,
+  IBlogTag,
+  IGetArticlesParams
+} from 'types/blog';
 import axios from 'utils/axios';
 import { BLOG_BASE_API_ENDPOINT } from 'utils/constants';
 
@@ -13,7 +21,7 @@ export const getArticleBySlug = async ({ slug }: { slug: string }): Promise<Arti
   return res.data;
 };
 
-export const getBlogCategories = async (): Promise<IBlogCategory[]> => {
+export const getBlogCategories = async (): Promise<BlogCategory[]> => {
   const res = await axios.get(`${BLOG_BASE_API_ENDPOINT}/categories`);
   return res.data;
 };
@@ -35,5 +43,20 @@ export const updateArticle = async ({ slug, data }: { slug: string; data: Articl
 
 export const deleteArticle = async ({ id }: { id: string }) => {
   const res = await axios.delete(`${BLOG_BASE_API_ENDPOINT}/${id}`);
+  return res.data;
+};
+
+export const createCategory = async (data: ArticleCategoryFormValues) => {
+  const res = await axios.post(`${BLOG_BASE_API_ENDPOINT}/categories`, data);
+  return res.data;
+};
+
+export const updateCategory = async ({ id, data }: { id: string; data: ArticleCategoryFormValues }) => {
+  const res = await axios.put(`${BLOG_BASE_API_ENDPOINT}/categories/${id}`, data);
+  return res.data;
+};
+
+export const deleteCategory = async ({ id }: { id: string }) => {
+  const res = await axios.delete(`${BLOG_BASE_API_ENDPOINT}/categories/${id}`);
   return res.data;
 };

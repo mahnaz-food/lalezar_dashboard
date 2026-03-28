@@ -1,6 +1,5 @@
 import { AppForm, FormFieldConfig } from 'components/form/AppFrom';
 import { ArticleDetails, ArticleFormValues } from 'types/blog';
-import { createArticleSchema } from '../../../validators/blog-schema';
 import { BlockEditor } from 'components/form/BlockEditor';
 import {
   useCreateArticleMutation,
@@ -14,6 +13,7 @@ import { useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import FormSkeleton from 'components/skeleton/FormSkeleton';
 import { toast } from 'sonner';
+import { createArticleSchema } from '../../../../validators/blog-schema';
 
 const defaultValues: ArticleFormValues = {
   title: '',

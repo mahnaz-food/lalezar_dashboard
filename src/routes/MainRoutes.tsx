@@ -7,8 +7,9 @@ import PagesLayout from 'layout/Pages';
 import SimpleLayout from 'layout/Simple';
 import { SimpleLayoutType } from 'config';
 import DashboardPage from 'pages/dashboard';
-import SingleArticlePage from 'pages/blog/single-article-page';
-import CreateArticlePage from 'pages/blog/create-article-page';
+import SingleArticlePage from 'pages/blog/article/single-article-page';
+import ArticleCategoryPage from 'pages/blog/article-categories/categories-page';
+import CreateArticlePage from 'pages/blog/article/create-article-page';
 
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
 const MaintenanceError500 = Loadable(lazy(() => import('pages/maintenance/error/500')));
@@ -16,7 +17,7 @@ const MaintenanceUnderConstruction = Loadable(lazy(() => import('pages/maintenan
 const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/coming-soon/coming-soon')));
 
 const AppContactUS = Loadable(lazy(() => import('pages/contact-us')));
-const BlogPage = Loadable(lazy(() => import('pages/blog/blog-page')));
+const BlogPage = Loadable(lazy(() => import('pages/blog/article/blog-page')));
 const UsersPage = Loadable(lazy(() => import('pages/users/users-page')));
 
 // ==============================|| MAIN ROUTES ||============================== //
@@ -40,6 +41,14 @@ const MainRoutes = {
         {
           path: '/blog/create-article',
           element: <CreateArticlePage />
+        },
+        {
+          path: '/article-category/create-category',
+          element: <CreateArticlePage />
+        },
+        {
+          path: '/article-category',
+          element: <ArticleCategoryPage />
         },
         {
           path: '/users',

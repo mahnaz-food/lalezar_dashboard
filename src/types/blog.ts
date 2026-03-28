@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { IBaseQueryParams } from './api';
-import { blockSchema, createArticleSchema } from '../../validators/blog-schema';
+import { blockSchema, createArticleCategorySchema, createArticleSchema, createArticleTagSchema } from '../../validators/blog-schema';
 
 export interface IGetArticlesParams extends IBaseQueryParams {
   category?: string;
@@ -15,7 +15,7 @@ export interface ArticleSummary {
   image: null | string;
   readingTime: null | number;
   views: number;
-  categories: IBlogCategory[];
+  categories: BlogCategory[];
   tags: IBlogTag[];
   createdAt: string;
   updatedAt: string;
@@ -25,7 +25,7 @@ export interface ArticleSummary {
   commentsCount: number;
 }
 
-export interface IBlogCategory {
+export interface BlogCategory {
   id: string;
   name: string;
   slug: string;
@@ -48,3 +48,6 @@ export interface ArticleDetails extends ArticleSummary {
   isFeatured: boolean;
   isPublished: boolean;
 }
+
+export type ArticleCategoryFormValues = z.infer<typeof createArticleCategorySchema>;
+export type ArticleTagFormValues = z.infer<typeof createArticleTagSchema>;

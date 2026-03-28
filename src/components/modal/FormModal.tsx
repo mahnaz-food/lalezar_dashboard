@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+// import { Button } from '@mui/material';
 import { BaseModal } from './BaseModal';
 
 type FormModalProps = {
@@ -16,14 +16,14 @@ export function FormModal({ open, onClose, title, children, onSubmit, isSubmitti
       open={open}
       onClose={onClose}
       title={title}
-      actions={
-        <>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button variant="contained" onClick={onSubmit} disabled={isSubmitting}>
-            Submit
-          </Button>
-        </>
-      }
+      // actions={
+      //   <>
+      //     <Button onClick={onClose}>Cancel</Button>
+      //     <Button variant="contained" onClick={onSubmit} disabled={isSubmitting}>
+      //       Submit
+      //     </Button>
+      //   </>
+      // }
     >
       {children}
     </BaseModal>

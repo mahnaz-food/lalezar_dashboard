@@ -1,5 +1,4 @@
 import { Fragment, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { alpha, useTheme } from '@mui/material/styles';
 import {
   Stack,
@@ -28,7 +27,7 @@ interface ReactTableProps<T> {
   columns: ColumnDef<T>[];
   tableTitle?: string;
 
-  getRowLink?: (row: T) => string;
+  onViewRow?: (row: T) => void;
   onDeleteRow?: (row: T) => void;
 
   onAdd?: () => void;
@@ -45,7 +44,7 @@ export default function ReactTable<T>({
   data,
   columns,
   tableTitle,
-  getRowLink,
+  onViewRow,
   onDeleteRow,
   onAdd,
   addButtonLabel = 'Add',
@@ -55,7 +54,6 @@ export default function ReactTable<T>({
 }: ReactTableProps<T>) {
   const theme = useTheme();
   const backColor = alpha(theme.palette.primary.lighter, 0.1);
-  const navigate = useNavigate();
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -80,8 +78,8 @@ export default function ReactTable<T>({
       return (
         <Stack direction="row" spacing={1}>
           {/* 👁 View */}
-          {getRowLink && (
-            <IconButton color="primary" onClick={() => navigate(getRowLink(data))}>
+          {onViewRow && (
+            <IconButton color="primary" onClick={() => onViewRow(data)}>
               <Eye size="20" />
             </IconButton>
           )}
@@ -174,17 +172,18 @@ export default function ReactTable<T>({
                   <Fragment key={row.id}>
                     <TableRow>
                       {row.getVisibleCells().map((cell, idx) => {
-                        const isFirstCell = idx === 1;
-                        const link = getRowLink?.(row.original);
+                        const isSelectionCell = idx === 0; // checkbox column
+                        const isActionCell = cell.column.id === 'actions';
+                        const clickable = !!onViewRow && !isSelectionCell && !isActionCell;
                         return (
-                          <TableCell key={cell.id}>
-                            {isFirstCell && link ? (
-                              <RouterLink to={link} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                              </RouterLink>
-                            ) : (
-                              flexRender(cell.column.columnDef.cell, cell.getContext())
-                            )}
+                          <TableCell
+                            key={cell.id}
+                            onClick={() => clickable && onViewRow?.(row.original)}
+                            sx={{
+                              cursor: clickable ? 'pointer' : 'default'
+                            }}
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </TableCell>
                         );
                       })}

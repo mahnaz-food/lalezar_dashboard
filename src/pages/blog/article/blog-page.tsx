@@ -63,7 +63,7 @@ export default function BlogPage() {
         enableExport
         addButtonLabel="Create Blog"
         isLoading={isLoading || isSingleDeletePending}
-        getRowLink={(row) => `/blog/${row.slug}`}
+        onViewRow={(row) => navigate(`/blog/${row.slug}`)}
         onDeleteRow={(row) => {
           handleDelete(row.slug);
         }}

@@ -5,11 +5,12 @@ type ConfirmModalProps = {
   open: boolean;
   title?: string;
   description?: string;
+  isPending?: boolean;
   onClose: () => void;
   onConfirm: () => void;
 };
 
-export function ConfirmModal({ open, title = 'Are you sure?', description, onClose, onConfirm }: ConfirmModalProps) {
+export function ConfirmModal({ open, title = 'Are you sure?', description, isPending, onClose, onConfirm }: ConfirmModalProps) {
   return (
     <BaseModal
       open={open}
@@ -22,6 +23,7 @@ export function ConfirmModal({ open, title = 'Are you sure?', description, onClo
           </Button>
           <Button
             variant="contained"
+            disabled={isPending}
             onClick={() => {
               onConfirm();
               onClose();

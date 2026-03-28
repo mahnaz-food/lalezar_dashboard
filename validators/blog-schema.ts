@@ -92,3 +92,15 @@ export const createArticleSchema = z.object({
   metaDescription: z.string().default(''),
   readingTime: z.number().optional()
 });
+
+// ─── Category ──────────────────────────────────────────────────────────────────
+
+export const createArticleCategorySchema = z.object({
+  name: z.string().min(2, 'Category name must be at least 2 characters').max(50, 'Category name cannot exceed 50 characters')
+});
+
+// ─── Tag ──────────────────────────────────────────────────────────────────
+
+export const createArticleTagSchema = z.object({
+  name: z.string().min(2, 'Tag name must be at least 2 characters').max(50, 'Tag name cannot exceed 50 characters')
+});

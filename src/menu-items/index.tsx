@@ -1,16 +1,12 @@
-// project import
-// import support from './support';
-// import pages from './pages';
-
 // types
 import { NavItemType } from 'types/menu';
-import website from './website';
+import blogSection from './blogSection';
+import userSection from './userSection';
 
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems: { items: NavItemType[] } = {
-  items: [website]
-  // items: [website, pages, support]
+  items: [blogSection, userSection]
 };
 
 export default menuItems;
