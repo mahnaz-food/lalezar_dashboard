@@ -6,6 +6,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 
 // assets
 import { SearchNormal1 } from 'iconsax-react';
+import { useEffect, useState } from 'react';
 
 interface SearchProps {
   query: string;
@@ -15,6 +16,15 @@ interface SearchProps {
 // ==============================|| HEADER CONTENT - SEARCH ||============================== //
 
 export default function Search({ query, setQuery }: SearchProps) {
+  const [localValue, setLocalValue] = useState(query);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setQuery(localValue);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [localValue, setQuery]);
   return (
     <Box sx={{ ml: { xs: 0, md: 2 } }}>
       <FormControl sx={{ width: { xs: '100%', md: 224 } }}>
@@ -25,8 +35,8 @@ export default function Search({ query, setQuery }: SearchProps) {
               <SearchNormal1 size={16} />
             </InputAdornment>
           }
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={localValue}
+          onChange={(e) => setLocalValue(e.target.value)}
           aria-describedby="header-search-text"
           inputProps={{ 'aria-label': 'weight' }}
           placeholder="Search..."
