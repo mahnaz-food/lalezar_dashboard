@@ -10,7 +10,6 @@ import Popper from '@mui/material/Popper';
 import Toolbar from '@mui/material/Toolbar';
 
 // project-imports
-import Search from './Search';
 import Profile from './Profile';
 import IconButton from 'components/@extended/IconButton';
 import Transitions from 'components/@extended/Transitions';
@@ -84,7 +83,6 @@ export default function MobileSection() {
               <ClickAwayListener onClickAway={handleClose}>
                 <AppBar color="inherit">
                   <Toolbar>
-                    <Search />
                     <Profile />
                   </Toolbar>
                 </AppBar>

@@ -17,6 +17,7 @@ import { DRAWER_WIDTH, MINI_DRAWER_WIDTH, MenuOrientation, ThemeMode } from 'con
 // assets
 import { HambergerMenu } from 'iconsax-react';
 import { useMenu } from 'contexts/MenuContext';
+import { Box } from '@mui/material';
 
 // ==============================|| MAIN LAYOUT - HEADER ||============================== //
 
@@ -38,7 +39,7 @@ export default function Header() {
 
   // common header
   const mainHeader: ReactNode = (
-    <Toolbar sx={{ px: { xs: 2, sm: 4.5, lg: 8 } }}>
+    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', px: { xs: 2, sm: 4.5, lg: 8 } }}>
       {!isHorizontal ? (
         <IconButton
           aria-label="open drawer"
@@ -52,7 +53,7 @@ export default function Header() {
           <HambergerMenu />
         </IconButton>
       ) : null}
-      {headerContent}
+      <Box>{headerContent}</Box>
     </Toolbar>
   );
 

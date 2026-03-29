@@ -6,6 +6,7 @@ import ReactTable from 'components/table/Table';
 import { useModal } from 'contexts/ModalContext';
 import { useDeleteArticleMutation, useGetArticlesQuery } from 'hooks/api/blog/blogHooks';
 import { ArticleSummary } from 'types/blog';
+import { useState } from 'react';
 
 export const columns: ColumnDef<ArticleSummary>[] = [
   {
@@ -27,10 +28,15 @@ export const columns: ColumnDef<ArticleSummary>[] = [
 ];
 
 export default function BlogPage() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { confirm } = useModal();
-  const { data, isLoading } = useGetArticlesQuery();
-  const navigate = useNavigate();
+
+  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState<string>('all');
+
+  const { data, isLoading } = useGetArticlesQuery({ page, category, query });
 
   const { mutate: deleteSingleArticle, isPending: isSingleDeletePending } = useDeleteArticleMutation();
 
@@ -54,20 +60,25 @@ export default function BlogPage() {
     });
   };
   return (
-    <>
-      <ReactTable
-        data={formatted}
-        columns={columns as ArticleSummary[]}
-        tableTitle="Articles List"
-        onAdd={() => navigate('/blog/create-article')}
-        enableExport
-        addButtonLabel="Create Blog"
-        isLoading={isLoading || isSingleDeletePending}
-        onViewRow={(row) => navigate(`/blog/${row.slug}`)}
-        onDeleteRow={(row) => {
-          handleDelete(row.slug);
-        }}
-      />
-    </>
+    <ReactTable
+      data={formatted}
+      columns={columns as ArticleSummary[]}
+      tableTitle="Articles List"
+      onAdd={() => navigate('/blog/create-article')}
+      enableExport
+      addButtonLabel="Create Blog"
+      isLoading={isLoading || isSingleDeletePending}
+      onViewRow={(row) => navigate(`/blog/${row.slug}`)}
+      onDeleteRow={(row) => {
+        handleDelete(row.slug);
+      }}
+      page={page}
+      setPage={setPage}
+      query={query}
+      setQuery={setQuery}
+      category={category}
+      setCategory={setCategory}
+      numOfPages={data?.totalPages}
+    />
   );
 }

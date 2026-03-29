@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react';
-import { alpha, useTheme } from '@mui/material/styles';
+import { alpha, Theme, useTheme } from '@mui/material/styles';
 import {
   Stack,
   Button,
@@ -11,7 +11,10 @@ import {
   TableContainer,
   Checkbox,
   Typography,
-  IconButton
+  IconButton,
+  Box,
+  Pagination,
+  useMediaQuery
 } from '@mui/material';
 
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, RowSelectionState, useReactTable } from '@tanstack/react-table';
@@ -21,6 +24,7 @@ import ScrollX from 'components/ScrollX';
 import { CSVExport, EmptyTable } from 'components/third-party/react-table';
 import { Add, Trash, Eye } from 'iconsax-react';
 import TableSkeleton from '../skeleton/TableSkeleton';
+import Search from 'layout/Dashboard/Header/HeaderContent/Search';
 
 interface ReactTableProps<T> {
   data: T[];
@@ -38,6 +42,18 @@ interface ReactTableProps<T> {
   isLoading?: boolean;
 
   emptyTableMsg?: string;
+
+  // Pagination props
+  hasPagination?: boolean;
+  page?: number;
+  setPage?: (state: number) => void;
+  query?: string;
+  setQuery?: (state: string) => void;
+  category?: string;
+  setCategory?: (state: string) => void;
+  numOfPages?: number;
+
+  hasFilter?: boolean;
 }
 
 export default function ReactTable<T>({
@@ -50,10 +66,22 @@ export default function ReactTable<T>({
   addButtonLabel = 'Add',
   enableExport = false,
   isLoading,
-  emptyTableMsg
+  emptyTableMsg,
+  hasPagination = true,
+  page,
+  setPage,
+  query,
+  setQuery,
+  category,
+  setCategory,
+  numOfPages = 0,
+  hasFilter = false
 }: ReactTableProps<T>) {
   const theme = useTheme();
   const backColor = alpha(theme.palette.primary.lighter, 0.1);
+  const downLG = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
+
+  const showSearchBar = query !== undefined && setQuery;
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -117,90 +145,106 @@ export default function ReactTable<T>({
   const selectedData = selectedRows.map((row) => row.original);
 
   return (
-    <MainCard content={false}>
-      {/* Header */}
-      <Stack direction="row" justifyContent="space-between" sx={{ p: 3 }}>
-        {tableTitle && <Typography variant="h4">{tableTitle}</Typography>}
-        <Stack direction="row" spacing={2} alignItems="center">
-          {onAdd && (
-            <Button variant="contained" startIcon={<Add />} onClick={onAdd}>
-              {addButtonLabel}
-            </Button>
-          )}
+    <>
+      <MainCard content={false}>
+        {/* Header */}
+        <Stack direction="row" justifyContent="space-between" sx={{ p: 3 }}>
+          {tableTitle && <Typography variant="h4">{tableTitle}</Typography>}
+          {!downLG && showSearchBar && <Search query={query} setQuery={setQuery} />}
+          <Stack direction="row" spacing={2} alignItems="center">
+            {onAdd && (
+              <Button variant="contained" startIcon={<Add />} onClick={onAdd}>
+                {addButtonLabel}
+              </Button>
+            )}
 
-          {enableExport && <CSVExport data={data} headers={headers} filename={tableTitle ? `${tableTitle}.csv` : 'export.csv'} />}
+            {enableExport && <CSVExport data={data} headers={headers} filename={tableTitle ? `${tableTitle}.csv` : 'export.csv'} />}
 
-          {/* Multiple Delete Button */}
-          {selectedRows.length > 0 && (
-            <Button
-              color="error"
-              variant="contained"
-              onClick={() => {
-                console.log('Delete these:', selectedData);
-              }}
-            >
-              Delete ({selectedRows.length})
-            </Button>
-          )}
+            {/* Multiple Delete Button */}
+            {selectedRows.length > 0 && (
+              <Button
+                color="error"
+                variant="contained"
+                onClick={() => {
+                  console.log('Delete these:', selectedData);
+                }}
+              >
+                Delete ({selectedRows.length})
+              </Button>
+            )}
+          </Stack>
         </Stack>
-      </Stack>
 
-      <ScrollX>
-        <TableContainer sx={{ maxHeight: 350 }}>
-          <Table>
-            {/* Table Head */}
-            <TableHead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableCell key={header.id} sx={{ fontWeight: 600 }}>
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHead>
+        <ScrollX>
+          <TableContainer sx={{ maxHeight: { xs: 'none', sm: 'none', md: 'none', lg: 300 } }}>
+            <Table>
+              {/* Table Head */}
+              <TableHead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableCell key={header.id} sx={{ fontWeight: 600 }}>
+                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHead>
 
-            {/* Table Body */}
-            <TableBody>
-              {isLoading ? (
-                <TableSkeleton columns={columns} numOfAllColumns={table.getAllColumns().length} />
-              ) : table.getRowModel().rows.length === 0 ? (
-                <EmptyTable msg={emptyTableMsg || 'Table is empty'} numOfColumns={columns.length} />
-              ) : (
-                table.getRowModel().rows.map((row) => (
-                  <Fragment key={row.id}>
-                    <TableRow>
-                      {row.getVisibleCells().map((cell, idx) => {
-                        const isSelectionCell = idx === 0; // checkbox column
-                        const isActionCell = cell.column.id === 'actions';
-                        const clickable = !!onViewRow && !isSelectionCell && !isActionCell;
-                        return (
-                          <TableCell
-                            key={cell.id}
-                            onClick={() => clickable && onViewRow?.(row.original)}
-                            sx={{
-                              cursor: clickable ? 'pointer' : 'default'
-                            }}
-                          >
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-
-                    {row.getIsExpanded() && (
-                      <TableRow sx={{ bgcolor: backColor }}>
-                        <TableCell colSpan={row.getVisibleCells().length}>{/* expandable content */}</TableCell>
+              {/* Table Body */}
+              <TableBody>
+                {isLoading ? (
+                  <TableSkeleton columns={columns} numOfAllColumns={table.getAllColumns().length} />
+                ) : table.getRowModel().rows.length === 0 ? (
+                  <EmptyTable msg={emptyTableMsg || 'Table is empty'} numOfColumns={columns.length} />
+                ) : (
+                  table.getRowModel().rows.map((row) => (
+                    <Fragment key={row.id}>
+                      <TableRow>
+                        {row.getVisibleCells().map((cell, idx) => {
+                          const isSelectionCell = idx === 0; // checkbox column
+                          const isActionCell = cell.column.id === 'actions';
+                          const clickable = !!onViewRow && !isSelectionCell && !isActionCell;
+                          return (
+                            <TableCell
+                              key={cell.id}
+                              onClick={() => clickable && onViewRow?.(row.original)}
+                              sx={{
+                                cursor: clickable ? 'pointer' : 'default'
+                              }}
+                            >
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </TableCell>
+                          );
+                        })}
                       </TableRow>
-                    )}
-                  </Fragment>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </ScrollX>
-    </MainCard>
+
+                      {row.getIsExpanded() && (
+                        <TableRow sx={{ bgcolor: backColor }}>
+                          <TableCell colSpan={row.getVisibleCells().length}>{/* expandable content */}</TableCell>
+                        </TableRow>
+                      )}
+                    </Fragment>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </ScrollX>
+      </MainCard>
+      {hasPagination && (
+        <Box sx={{ mt: 4 }}>
+          <Pagination
+            count={numOfPages}
+            page={page}
+            onChange={(_, value) => setPage?.(value)}
+            showFirstButton
+            showLastButton
+            color="primary"
+            variant="combined"
+          />
+        </Box>
+      )}
+    </>
   );
 }
