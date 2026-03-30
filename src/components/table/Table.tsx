@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { alpha, Theme, useTheme } from '@mui/material/styles';
 import {
   Stack,
@@ -21,10 +21,11 @@ import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, RowSelec
 
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
-import { CSVExport, EmptyTable } from 'components/third-party/react-table';
-import { Add, Trash, Eye } from 'iconsax-react';
+import { EmptyTable } from 'components/third-party/react-table';
+import { Trash, Eye } from 'iconsax-react';
 import TableSkeleton from '../skeleton/TableSkeleton';
-import Search from 'layout/Dashboard/Header/HeaderContent/Search';
+import TableMobileMenu from './table-mobile-menu';
+import { getTableActions } from './table-actions';
 
 interface ReactTableProps<T> {
   data: T[];
@@ -81,7 +82,7 @@ export default function ReactTable<T>({
   const backColor = alpha(theme.palette.primary.lighter, 0.1);
   const downLG = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
-  const showSearchBar = query !== undefined && setQuery;
+  const showSearchBar = query !== undefined && setQuery !== undefined;
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -105,14 +106,14 @@ export default function ReactTable<T>({
 
       return (
         <Stack direction="row" spacing={1}>
-          {/* 👁 View */}
+          {/* View */}
           {onViewRow && (
             <IconButton color="primary" onClick={() => onViewRow(data)}>
               <Eye size="20" />
             </IconButton>
           )}
 
-          {/* 🗑 Delete */}
+          {/* Delete */}
           {onDeleteRow && (
             <IconButton color="error" onClick={() => onDeleteRow(data)}>
               <Trash size="20" />
@@ -144,39 +145,53 @@ export default function ReactTable<T>({
   const selectedRows = table.getSelectedRowModel().rows;
   const selectedData = selectedRows.map((row) => row.original);
 
+  const actions = useMemo(() => {
+    return getTableActions({
+      showSearchBar,
+      query,
+      setQuery,
+      onAdd,
+      addButtonLabel,
+      enableExport,
+      data,
+      headers,
+      tableTitle,
+      selectedData,
+      selectedRows
+    });
+  }, [addButtonLabel, data, enableExport, headers, onAdd, query, selectedData, selectedRows, setQuery, showSearchBar, tableTitle]);
+
   return (
     <>
       <MainCard content={false}>
         {/* Header */}
         <Stack direction="row" justifyContent="space-between" sx={{ p: 3 }}>
           {tableTitle && <Typography variant="h4">{tableTitle}</Typography>}
-          {!downLG && showSearchBar && <Search query={query} setQuery={setQuery} />}
-          <Stack direction="row" spacing={2} alignItems="center">
-            {onAdd && (
-              <Button variant="contained" startIcon={<Add />} onClick={onAdd}>
-                {addButtonLabel}
-              </Button>
-            )}
+          {downLG ? (
+            <TableMobileMenu actions={actions} />
+          ) : (
+            <Stack direction="row" spacing={2} alignItems="center">
+              {actions.map((action: any) => {
+                if (action.render) return <Box key={action.key}>{action.render()}</Box>;
 
-            {enableExport && <CSVExport data={data} headers={headers} filename={tableTitle ? `${tableTitle}.csv` : 'export.csv'} />}
-
-            {/* Multiple Delete Button */}
-            {selectedRows.length > 0 && (
-              <Button
-                color="error"
-                variant="contained"
-                onClick={() => {
-                  console.log('Delete these:', selectedData);
-                }}
-              >
-                Delete ({selectedRows.length})
-              </Button>
-            )}
-          </Stack>
+                return (
+                  <Button
+                    key={action.key}
+                    variant="contained"
+                    color={action.color || 'primary'}
+                    startIcon={action.icon}
+                    onClick={action.onClick}
+                  >
+                    {action.label}
+                  </Button>
+                );
+              })}
+            </Stack>
+          )}
         </Stack>
 
         <ScrollX>
-          <TableContainer sx={{ maxHeight: { xs: 'none', sm: 'none', md: 'none', lg: 300 } }}>
+          <TableContainer sx={{ maxHeight: { xs: 'none', sm: 'none', md: 'none', lg: 280 } }}>
             <Table>
               {/* Table Head */}
               <TableHead>

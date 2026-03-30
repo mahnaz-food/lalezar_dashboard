@@ -64,10 +64,7 @@ export default function FooterBlock({ isFull }: showProps) {
                     <Logo />
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 400, maxWidth: 320 }}>
-                      Phoenixcoded has gained the trust of over 5.5K customers since 2015, thanks to our commitment to delivering
-                      high-quality products. Our experienced team players are responsible for managing Able Pro.
-                    </Typography>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 400, maxWidth: 320 }}></Typography>
                   </Grid>
                 </Grid>
               </motion.div>

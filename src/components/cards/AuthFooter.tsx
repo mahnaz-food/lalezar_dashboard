@@ -20,7 +20,7 @@ export default function AuthFooter() {
         textAlign={matchDownSM ? 'center' : 'inherit'}
       >
         <Typography variant="subtitle2" color="secondary">
-          Able Pro ♥ crafted by Team{' '}
+          Lalezar Admin Dashboard crafted by ♥
           <Typography
             component={Link}
             variant="subtitle2"
