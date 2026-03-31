@@ -46,14 +46,14 @@ export default function UsersPage() {
 
   const handleDelete = async (id: string) => {
     await confirm({
-      title: 'Delete Article',
-      description: 'Are you sure you want to delete this article?',
+      title: 'Delete User',
+      description: 'Are you sure you want to delete this user?',
       onConfirm: async () => {
         deleteSingleUser(
           { id },
           {
             onSuccess: (data: { message: string }) => {
-              queryClient.invalidateQueries({ queryKey: ['articles'] });
+              queryClient.invalidateQueries({ queryKey: ['users'] });
               toast.success(data.message);
             }
           }

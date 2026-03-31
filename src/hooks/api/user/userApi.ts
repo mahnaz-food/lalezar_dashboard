@@ -19,7 +19,7 @@ export const getUser = async ({ id }: { id: string }): Promise<User> => {
 };
 
 export const addUser = async (data: CreateUserFormValues) => {
-  const res = await axios.post(`${USER_BASE_API_ENDPOINT}/create-user`, data);
+  const res = await axios.post(USER_BASE_API_ENDPOINT, data);
   return res.data;
 };
 
