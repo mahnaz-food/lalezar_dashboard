@@ -4,7 +4,7 @@ import { FormTextField } from './FormTextField';
 import Button from '@mui/material/Button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ZodTypeAny } from 'zod';
-import { FormSingleSelect, IOption } from './FormSingleSelect';
+import { FormSingleSelect, Option } from './FormSingleSelect';
 import { FormSwitch } from './FormSwitch';
 import { FormMultiSelect } from './FormMulitSelect';
 
@@ -16,7 +16,7 @@ export type FormFieldConfig<T extends FieldValues> = {
   placeholder?: string;
   type?: FieldType;
   rows?: number;
-  options?: IOption[];
+  options?: Option[];
   xs?: number;
   md?: number;
   disabled?: boolean;

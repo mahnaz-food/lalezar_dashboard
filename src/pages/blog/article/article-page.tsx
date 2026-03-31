@@ -1,7 +1,6 @@
 import { useGetArticleBySlugQuery } from 'hooks/api/blog/blogHooks';
 import { useParams } from 'react-router';
-import ArticleForm from './ArticleForm';
-
+import ArticleForm from './article-form';
 
 export default function SingleArticlePage() {
   const { slug } = useParams();

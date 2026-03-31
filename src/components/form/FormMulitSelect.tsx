@@ -8,12 +8,12 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Chip from '@mui/material/Chip';
 import Box from '@mui/material/Box';
 import { SelectProps } from '@mui/material';
-import { IOption } from './FormSingleSelect';
+import { Option } from './FormSingleSelect';
 
 type FormMultiSelectProps<T extends FieldValues> = {
   name: Path<T>;
   label?: string;
-  options: IOption[];
+  options: Option[];
   placeholder?: string;
 } & Omit<SelectProps, 'name' | 'value' | 'onChange' | 'multiple'>;
 

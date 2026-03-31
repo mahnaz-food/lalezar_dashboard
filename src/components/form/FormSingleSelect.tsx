@@ -6,7 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
 import { SelectProps } from '@mui/material';
 
-export interface IOption {
+export interface Option {
   label: string;
   value: string | number;
 }
@@ -14,7 +14,7 @@ export interface IOption {
 type FormSingleSelectProps<T extends FieldValues> = {
   name: Path<T>;
   label?: string;
-  options: IOption[];
+  options: Option[];
   placeholder?: string;
 } & Omit<SelectProps, 'name' | 'value' | 'onChange'>;
 

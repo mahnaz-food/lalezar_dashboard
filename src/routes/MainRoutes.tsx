@@ -7,10 +7,12 @@ import PagesLayout from 'layout/Pages';
 import SimpleLayout from 'layout/Simple';
 import { SimpleLayoutType } from 'config';
 import DashboardPage from 'pages/dashboard';
-import SingleArticlePage from 'pages/blog/article/single-article-page';
+import SingleArticlePage from 'pages/blog/article/article-page';
 import ArticleCategoryPage from 'pages/blog/article-categories/categories-page';
 import CreateArticlePage from 'pages/blog/article/create-article-page';
 import ArticleTagsPage from 'pages/blog/article-tags/tags-page';
+import SingleUserPage from 'pages/users/user-page';
+import AddUserPage from 'pages/users/add-user-page';
 
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
 const MaintenanceError500 = Loadable(lazy(() => import('pages/maintenance/error/500')));
@@ -58,6 +60,14 @@ const MainRoutes = {
         {
           path: '/users',
           element: <UsersPage />
+        },
+        {
+          path: '/users/add-user',
+          element: <AddUserPage />
+        },
+        {
+          path: '/users/:id',
+          element: <SingleUserPage />
         }
       ]
     },

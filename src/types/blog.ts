@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { IBaseQueryParams } from './api';
+import { BaseQueryParams } from './api';
 import { blockSchema, createArticleCategorySchema, createArticleSchema, createArticleTagSchema } from '../../validators/blog-schema';
 
-export interface IGetArticlesParams extends IBaseQueryParams {
+export interface GetArticlesParams extends BaseQueryParams {
   category?: string;
 }
 

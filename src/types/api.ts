@@ -1,10 +1,10 @@
-export interface IBaseQueryParams {
+export interface BaseQueryParams {
   page?: number;
   limit?: number;
   query?: string;
 }
 
-export interface IPaginated<T> {
+export interface Paginated<T> {
   data: T[];
   page: number;
   totalPages: number;

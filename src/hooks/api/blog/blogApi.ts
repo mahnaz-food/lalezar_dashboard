@@ -1,4 +1,4 @@
-import { IPaginated } from 'types/api';
+import { Paginated } from 'types/api';
 import {
   ArticleCategoryFormValues,
   ArticleDetails,
@@ -7,12 +7,12 @@ import {
   ArticleTagFormValues,
   BlogCategory,
   BlogTag,
-  IGetArticlesParams
+  GetArticlesParams
 } from 'types/blog';
 import axios from 'utils/axios';
 import { BLOG_BASE_API_ENDPOINT } from 'utils/constants';
 
-export const getArticles = async (params?: IGetArticlesParams): Promise<IPaginated<ArticleSummary>> => {
+export const getArticles = async (params?: GetArticlesParams): Promise<Paginated<ArticleSummary>> => {
   const res = await axios.get(BLOG_BASE_API_ENDPOINT, { params });
   return res.data;
 };

@@ -14,9 +14,9 @@ import {
   updateCategory,
   updateTag
 } from './blogApi';
-import { ArticleCategoryFormValues, ArticleFormValues, ArticleTagFormValues, IGetArticlesParams } from 'types/blog';
+import { ArticleCategoryFormValues, ArticleFormValues, ArticleTagFormValues, GetArticlesParams } from 'types/blog';
 
-export const useGetArticlesQuery = (params?: IGetArticlesParams) => {
+export const useGetArticlesQuery = (params?: GetArticlesParams) => {
   const queryKey = ['articles', params?.page, params?.limit, params?.query, params?.category];
   return useQuery({
     queryKey,

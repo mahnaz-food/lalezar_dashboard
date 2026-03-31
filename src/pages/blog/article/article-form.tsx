@@ -7,13 +7,19 @@ import {
   useGetBlogTagsQuery,
   useUpdateArticleMutation
 } from 'hooks/api/blog/blogHooks';
-import { IOption } from 'components/form/FormSingleSelect';
+import { Option } from 'components/form/FormSingleSelect';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import FormSkeleton from 'components/skeleton/FormSkeleton';
 import { toast } from 'sonner';
 import { createArticleSchema } from '../../../../validators/blog-schema';
+
+interface ArticleFormProps {
+  article?: ArticleDetails;
+  isLoading?: boolean;
+  slug?: string;
+}
 
 const defaultValues: ArticleFormValues = {
   title: '',
@@ -30,12 +36,6 @@ const defaultValues: ArticleFormValues = {
   tags: []
 };
 
-interface ArticleFormProps {
-  article?: ArticleDetails;
-  isLoading?: boolean;
-  slug?: string;
-}
-
 export default function ArticleForm({ article, isLoading, slug }: ArticleFormProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -44,12 +44,12 @@ export default function ArticleForm({ article, isLoading, slug }: ArticleFormPro
   const { mutate: createArticle, isPending: isCreating } = useCreateArticleMutation();
   const { mutate: updateArticle, isPending: isUpdating } = useUpdateArticleMutation();
 
-  const categoryOptions: IOption[] = (categories ?? []).map((c) => ({
+  const categoryOptions: Option[] = (categories ?? []).map((c) => ({
     label: c.name,
     value: c.id
   }));
 
-  const tagOptions: IOption[] = (tags ?? []).map((tag) => ({
+  const tagOptions: Option[] = (tags ?? []).map((tag) => ({
     label: tag.name,
     value: tag.id
   }));
