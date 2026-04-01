@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { addUser, deleteUser, getUser, getUsers, loginUser, updateUser } from './userApi';
+import { addUser, deleteUser, getUser, getUsers, loginUser, logoutUser, updateUser } from './userApi';
 import { CreateUserFormValues, GetUsersParams, LoginFormValues, UpdateUserFormValues } from 'types/user';
 
 export const useLoginMutation = () => {
@@ -7,6 +7,13 @@ export const useLoginMutation = () => {
   return useMutation({
     mutationKey,
     mutationFn: (data: LoginFormValues) => loginUser(data)
+  });
+};
+
+export const useLogoutMutation = () => {
+  return useMutation({
+    mutationKey: ['logout'],
+    mutationFn: (data: null) => logoutUser()
   });
 };
 

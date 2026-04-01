@@ -29,7 +29,10 @@ axiosServices.interceptors.request.use(
 axiosServices.interceptors.response.use(
   (res) => res,
   (error) => {
-    handleError(error);
+    if (!error.config?.skipErrorToast) {
+      handleError(error);
+    }
+
     return Promise.reject(error);
   }
 );

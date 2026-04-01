@@ -30,6 +30,9 @@ import useAuth from 'hooks/useAuth';
 // assets
 import avatar1 from 'assets/images/users/avatar-6.png';
 import { Setting2, Profile, Logout } from 'iconsax-react';
+import { useLogoutMutation } from 'hooks/api/user/userHooks';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 // types
 interface TabPanelProps {
@@ -67,19 +70,18 @@ function a11yProps(index: number) {
 export default function ProfilePage() {
   const theme = useTheme();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { mutate: logout } = useLogoutMutation();
 
   const { data: user } = useAuth();
-  const handleLogout = async () => {
-    try {
-      // await logout();
-      navigate(`/login`, {
-        state: {
-          from: ''
-        }
-      });
-    } catch (err) {
-      console.error(err);
-    }
+  const handleLogout = () => {
+    logout(null, {
+      onSuccess: (data: { message: string }) => {
+        toast.success(data.message);
+        queryClient.clear();
+        navigate('/login');
+      }
+    });
   };
 
   const anchorRef = useRef<any>(null);

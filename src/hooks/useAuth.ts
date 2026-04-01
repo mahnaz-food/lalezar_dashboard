@@ -8,7 +8,7 @@ export default function useAuth({ enabled = true } = {}) {
   return useQuery({
     queryKey: ['me'],
     queryFn: async () => {
-      const res = await axios.get(`${USER_BASE_API_ENDPOINT}/profile`);
+      const res = await axios.get(`${USER_BASE_API_ENDPOINT}/profile`, { skipErrorToast: true });
       return res.data;
     },
     retry: false,

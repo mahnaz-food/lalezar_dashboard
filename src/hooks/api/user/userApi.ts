@@ -8,6 +8,11 @@ export const loginUser = async (data: LoginFormValues): Promise<LoginRes> => {
   return res.data;
 };
 
+export const logoutUser = async () => {
+  const res = await axios.post(`${USER_BASE_API_ENDPOINT}/logout`);
+  return res.data;
+};
+
 export const getUsers = async (params?: GetUsersParams): Promise<Paginated<User>> => {
   const res = await axios.get(USER_BASE_API_ENDPOINT, { params });
   return res.data;

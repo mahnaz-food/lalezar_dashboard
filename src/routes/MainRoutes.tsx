@@ -7,12 +7,6 @@ import PagesLayout from 'layout/Pages';
 import SimpleLayout from 'layout/Simple';
 import { SimpleLayoutType } from 'config';
 import DashboardPage from 'pages/dashboard';
-import SingleArticlePage from 'pages/blog/article/article-page';
-import ArticleCategoryPage from 'pages/blog/article-categories/categories-page';
-import CreateArticlePage from 'pages/blog/article/create-article-page';
-import ArticleTagsPage from 'pages/blog/article-tags/tags-page';
-import SingleUserPage from 'pages/users/user-page';
-import AddUserPage from 'pages/users/add-user-page';
 
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
 const MaintenanceError500 = Loadable(lazy(() => import('pages/maintenance/error/500')));
@@ -21,7 +15,13 @@ const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/comi
 
 const AppContactUS = Loadable(lazy(() => import('pages/contact-us')));
 const BlogPage = Loadable(lazy(() => import('pages/blog/article/blog-page')));
+const SingleArticlePage = Loadable(lazy(() => import('pages/blog/article/article-page')));
+const ArticleCategoryPage = Loadable(lazy(() => import('pages/blog/article-categories/categories-page')));
+const CreateArticlePage = Loadable(lazy(() => import('pages/blog/article/create-article-page')));
+const ArticleTagsPage = Loadable(lazy(() => import('pages/blog/article-tags/tags-page')));
 const UsersPage = Loadable(lazy(() => import('pages/users/users-page')));
+const SingleUserPage = Loadable(lazy(() => import('pages/users/user-page')));
+const AddUserPage = Loadable(lazy(() => import('pages/users/add-user-page')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 

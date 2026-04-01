@@ -22,6 +22,9 @@ import { ArrowRight2 } from 'iconsax-react';
 
 import avatar1 from 'assets/images/users/avatar-1.png';
 import { useMenu } from 'contexts/MenuContext';
+import { useLogoutMutation } from 'hooks/api/user/userHooks';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ExpandMoreProps extends IconButtonProps {
   theme: Theme;
@@ -50,22 +53,21 @@ const ExpandMore = styled(IconButton, { shouldForwardProp: (prop) => prop !== 't
 export default function UserList() {
   const theme = useTheme();
   const navigate = useNavigate();
+  const queryClient = useQueryClient()
 
   const { menu } = useMenu();
   const drawerOpen = menu.isDashboardDrawerOpened;
 
   const { data: user } = useAuth();
-  const handleLogout = async () => {
-    try {
-      // await logout();
-      navigate(`/login`, {
-        state: {
-          from: ''
-        }
-      });
-    } catch (err) {
-      console.error(err);
-    }
+  const { mutate: logout, isPending: isLoggingOut } = useLogoutMutation();
+  const handleLogout = () => {
+    logout(null, {
+      onSuccess: (data: { message: string }) => {
+        toast.success(data.message);
+        queryClient.clear()
+        navigate('/login');
+      }
+    });
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -118,7 +120,9 @@ export default function UserList() {
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         transformOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <MenuItem onClick={handleLogout}>Logout</MenuItem>
+        <MenuItem onClick={handleLogout} disabled={isLoggingOut}>
+          Logout
+        </MenuItem>
         <MenuItem component={Link} to="#" onClick={handleClose}>
           Profile
         </MenuItem>

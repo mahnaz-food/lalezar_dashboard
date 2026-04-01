@@ -12,10 +12,8 @@ import { GuardProps } from 'types/auth';
 
 export default function GuestGuard({ children }: GuardProps) {
   const location = useLocation();
-  const guestPages = ['/login', 'forget-password'];
-  const isGuestPage = guestPages.includes(location.pathname);
 
-  const { data: user } = useAuth({ enabled: !isGuestPage });
+  const { data: user } = useAuth();
   const isLoggedIn = !!user;
 
   const navigate = useNavigate();
