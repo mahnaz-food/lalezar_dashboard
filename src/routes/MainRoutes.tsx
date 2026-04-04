@@ -22,6 +22,7 @@ const ArticleTagsPage = Loadable(lazy(() => import('pages/blog/article-tags/tags
 const UsersPage = Loadable(lazy(() => import('pages/users/users-page')));
 const SingleUserPage = Loadable(lazy(() => import('pages/users/user-page')));
 const AddUserPage = Loadable(lazy(() => import('pages/users/add-user-page')));
+const HeroSlidersPage = Loadable(lazy(() => import('pages/hero-slider/hero-sliders-page')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
@@ -68,6 +69,10 @@ const MainRoutes = {
         {
           path: '/users/:id',
           element: <SingleUserPage />
+        },
+        {
+          path: '/website/hero-sliders',
+          element: <HeroSlidersPage />
         }
       ]
     },

@@ -45,7 +45,6 @@ interface ReactTableProps<T> {
   emptyTableMsg?: string;
 
   // Pagination props
-  hasPagination?: boolean;
   page?: number;
   setPage?: (state: number) => void;
   query?: string;
@@ -68,7 +67,6 @@ export default function ReactTable<T>({
   enableExport = false,
   isLoading,
   emptyTableMsg,
-  hasPagination = true,
   page,
   setPage,
   query,
@@ -247,7 +245,7 @@ export default function ReactTable<T>({
           </TableContainer>
         </ScrollX>
       </MainCard>
-      {hasPagination && (
+      {numOfPages ? (
         <Box sx={{ mt: 4 }}>
           <Pagination
             count={numOfPages}
@@ -259,7 +257,7 @@ export default function ReactTable<T>({
             variant="combined"
           />
         </Box>
-      )}
+      ) : null}
     </>
   );
 }
