@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { AppForm, FormFieldConfig } from 'components/form/AppFrom';
+import { AppForm, FormFieldConfig } from 'components/form/AppForm';
 import { useNavigate } from 'react-router';
 import { CreateUserFormValues, UpdateUserFormValues, User } from 'types/user';
 import { Option } from 'components/form/FormSingleSelect';

@@ -9,7 +9,7 @@ import {
 } from 'hooks/api/blog/blogHooks';
 import { ArticleTagFormValues, BlogCategory, BlogTag } from 'types/blog';
 import { createArticleTagSchema } from '../../../../validators/blog-schema';
-import { FormFieldConfig } from 'components/form/AppFrom';
+import { FormFieldConfig } from 'components/form/AppForm';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 

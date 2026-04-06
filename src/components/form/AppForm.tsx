@@ -7,8 +7,10 @@ import { ZodTypeAny } from 'zod';
 import { FormSingleSelect, Option } from './FormSingleSelect';
 import { FormSwitch } from './FormSwitch';
 import { FormMultiSelect } from './FormMulitSelect';
+import { FormImageField } from './FormImage';
+import { FormButtonsField } from './FormButton';
 
-export type FieldType = 'text' | 'number' | 'multiLineText' | 'password' | 'select' | 'multiselect' | 'switch';
+export type FieldType = 'text' | 'number' | 'multiLineText' | 'password' | 'select' | 'multiselect' | 'switch' | 'image' | 'buttons';
 
 export type FormFieldConfig<T extends FieldValues> = {
   name: Path<T>;
@@ -89,6 +91,20 @@ export function AppForm<T extends FieldValues>({
             disabled={field.disabled}
           />
         );
+
+      case 'image':
+        return (
+          <FormImageField
+            label={field.label}
+            name={field.name}
+            placeholder={field.placeholder}
+            disabled={field.disabled}
+            control={methods.control}
+          />
+        );
+
+      case 'buttons':
+        return <FormButtonsField name={field.name as any} />;
 
       case 'number':
         return <FormTextField<T> name={field.name} label={field.label} type="number" />;

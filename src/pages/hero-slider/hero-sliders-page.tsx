@@ -1,7 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import ReactTable from 'components/table/Table';
 import { useModal } from 'contexts/ModalContext';
-import { FormFieldConfig } from 'components/form/AppFrom';
+import { FormFieldConfig } from 'components/form/AppForm';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -37,8 +37,16 @@ const defaultValues: HeroSlideFormValues = {
 };
 
 const fields: FormFieldConfig<HeroSlideFormValues>[] = [
-  { name: 'image', label: 'Image', placeholder: 'Enter image URL', type: 'text', md: 12 },
-  { name: 'headline', label: 'Headline', placeholder: 'Enter headline', type: 'text', md: 6 }
+  { name: 'image', label: 'Image', placeholder: 'Enter image URL', type: 'image', md: 12 },
+  { name: 'headline', label: 'Headline', placeholder: 'Enter headline', type: 'text', md: 12 },
+  { name: 'sub', label: 'Sub-Headline', placeholder: 'Enter sub-headline', type: 'text', md: 6 },
+  { name: 'tag', label: 'Tag', placeholder: 'Enter tag', type: 'text', md: 6 },
+  {
+    name: 'buttons',
+    label: 'Buttons',
+    type: 'buttons',
+    md: 12
+  }
 ];
 
 export default function HeroSlidersPage() {
@@ -61,7 +69,7 @@ export default function HeroSlidersPage() {
         addSlide(data, {
           onSuccess: (data: { message: string }) => {
             toast.success(data.message);
-            queryClient.invalidateQueries({ queryKey: ['blog-categories'] });
+            queryClient.invalidateQueries({ queryKey: ['hero-slides'] });
           }
         });
       }
@@ -81,7 +89,7 @@ export default function HeroSlidersPage() {
           {
             onSuccess: (data: { message: string }) => {
               toast.success(data.message);
-              queryClient.invalidateQueries({ queryKey: ['blog-categories'] });
+              queryClient.invalidateQueries({ queryKey: ['hero-slides'] });
             }
           }
         );

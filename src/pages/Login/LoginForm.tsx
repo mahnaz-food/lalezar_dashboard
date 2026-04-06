@@ -1,4 +1,4 @@
-import { AppForm, FormFieldConfig } from 'components/form/AppFrom';
+import { AppForm, FormFieldConfig } from 'components/form/AppForm';
 import { LoginFormValues } from 'types/user';
 import { loginSchema } from '../../../validators/user-schema';
 import { useLoginMutation } from 'hooks/api/user/userHooks';

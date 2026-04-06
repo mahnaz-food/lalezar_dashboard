@@ -1,4 +1,4 @@
-import { AppForm } from 'components/form/AppFrom';
+import { AppForm } from 'components/form/AppForm';
 import { ConfirmModal } from 'components/modal/ConfirmModal';
 import { FormModal } from 'components/modal/FormModal';
 import { createContext, useContext, useState } from 'react';

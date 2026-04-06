@@ -1,4 +1,4 @@
-import { AppForm, FormFieldConfig } from 'components/form/AppFrom';
+import { AppForm, FormFieldConfig } from 'components/form/AppForm';
 import { ArticleDetails, ArticleFormValues } from 'types/blog';
 import { BlockEditor } from 'components/form/BlockEditor';
 import {
