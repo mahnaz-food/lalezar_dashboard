@@ -80,7 +80,14 @@ export default function HeroSlidersPage() {
     openForm({
       title: 'Update Hero Slide',
       schema: slideFormSchema,
-      defaultValues: { ...defaultValues, image: row.image },
+      defaultValues: {
+        ...defaultValues,
+        image: row.image,
+        sub: row.sub || '',
+        tag: row.tag || '',
+        headline: row.headline || '',
+        buttons: row.buttons || []
+      },
       fields,
       isPending: isUpdating,
       onSubmit: (data: HeroSlideFormValues) => {
