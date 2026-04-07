@@ -26,3 +26,8 @@ export const deleteHeroSlide = async ({ id }: { id: string }) => {
   const res = await axios.delete(`${HERO_SLIDES_BASE_API_ENDPOINT}/${id}`);
   return res.data;
 };
+
+export const reorderSlides = async ({ ids }: { ids: string[] }) => {
+  const res = await axios.put(`${HERO_SLIDES_BASE_API_ENDPOINT}/reorder`, ids);
+  return res.data;
+};

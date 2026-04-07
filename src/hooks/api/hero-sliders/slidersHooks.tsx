@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { addHeroSlide, deleteHeroSlide, getHeroSlides, updateHeroSlide } from './slidersApi';
+import { addHeroSlide, deleteHeroSlide, getHeroSlides, reorderSlides, updateHeroSlide } from './slidersApi';
 import { HeroSlideFormValues } from 'types/admin';
 
 export const useGetHeroSlidesQuery = () => {
@@ -27,5 +27,12 @@ export const useDeleteHeroSlideMutation = () => {
   return useMutation({
     mutationKey: ['delete-slide'],
     mutationFn: ({ id }: { id: string }) => deleteHeroSlide({ id })
+  });
+};
+
+export const useReorderSlidesMutation = () => {
+  return useMutation({
+    mutationKey: ['reorder-slides'],
+    mutationFn: ({ ids }: { ids: string[] }) => reorderSlides({ ids })
   });
 };

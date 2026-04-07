@@ -8,6 +8,7 @@ import {
   useAddHeroSlideMutation,
   useDeleteHeroSlideMutation,
   useGetHeroSlidesQuery,
+  useReorderSlidesMutation,
   useUpdateHeroSlideMutation
 } from 'hooks/api/hero-sliders/slidersHooks';
 import { HeroSlideFormValues, Slide } from 'types/admin';
@@ -57,6 +58,7 @@ export default function HeroSlidersPage() {
   const { mutate: addSlide, isPending: isAdding } = useAddHeroSlideMutation();
   const { mutate: updateSlide, isPending: isUpdating } = useUpdateHeroSlideMutation();
   const { mutate: deleteSlide, isPending: isSingleDeleting } = useDeleteHeroSlideMutation();
+  const { mutate: reorder, isPending: isReordering } = useReorderSlidesMutation();
 
   const handleAddClick = () => {
     openForm({
@@ -122,6 +124,18 @@ export default function HeroSlidersPage() {
       }
     });
   };
+
+  const onRowReorder = (newData: Slide[]) => {
+    const ids = newData.map((elem) => elem.id);
+    reorder(
+      { ids },
+      {
+        onSuccess: (data: { message: string }) => {
+          toast.success(data.message);
+        }
+      }
+    );
+  };
   return (
     <>
       <ReactTable
@@ -131,11 +145,13 @@ export default function HeroSlidersPage() {
         onAdd={handleAddClick}
         enableExport
         addButtonLabel="Add Slide"
-        isLoading={isLoading}
+        isLoading={isLoading || isAdding || isSingleDeleting || isReordering || isUpdating}
         onViewRow={(row) => handleViewRow(row)}
         onDeleteRow={(row) => {
           handleDelete(row.id);
         }}
+        enableRowReordering
+        onReorder={onRowReorder}
       />
     </>
   );
